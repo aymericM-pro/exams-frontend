@@ -1,0 +1,38 @@
+<div class="question-item card">
+  <header class="header">
+    <input
+      [(ngModel)]="question.title"
+      class="input title"
+      placeholder="Enter question text..."
+      type="text"
+    />
+
+    <select
+      (ngModelChange)="onTypeChange()"
+      [(ngModel)]="question.type"
+      class="select type"
+    >
+      <option value="single">Single choice</option>
+      <option value="multiple">Multiple choice</option>
+      <option value="text">Text answer</option>
+    </select>
+
+    <button (click)="remove.emit()" class="remove">
+      <i class="mdi mdi-delete-outline"></i>
+    </button>
+  </header>
+
+  <div *ngIf="question.type !== 'text'" class="answers">
+    <app-answer-item
+      (remove)="removeAnswer(i)"
+      *ngFor="let a of question.answers; let i = index"
+      [answer]="a"
+      [type]="question.type"
+    />
+
+    <button (click)="addAnswer()" class="btn add">
+      <i class="mdi mdi-plus"></i>
+      Add Answer
+    </button>
+  </div>
+</div>

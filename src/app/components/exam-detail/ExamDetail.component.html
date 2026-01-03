@@ -1,0 +1,133 @@
+<div *ngIf="exam(); else notFound" class="exam-detail">
+
+  <!-- HEADER -->
+  <header class="exam-header">
+    <div>
+      <h1 class="title">
+        <i class="mdi mdi-file-question-outline"></i>
+        {{ exam()!.title }}
+      </h1>
+      <p class="subtitle">{{ exam()!.description }}</p>
+
+      <div class="chips">
+        <span class="chip">
+          <i class="mdi mdi-calendar-outline"></i> {{ createdAt() }}
+        </span>
+        <span class="chip">
+          <i class="mdi mdi-book-multiple-outline"></i>
+          {{ totalQuestions() }} questions
+        </span>
+        <span class="chip">
+          <i class="mdi mdi-format-list-bulleted-type"></i>
+          {{ totalMCQ() }} MCQ
+        </span>
+        <span class="chip">
+          <i class="mdi mdi-text-long"></i>
+          {{ totalOpen() }} open
+        </span>
+      </div>
+    </div>
+
+    <button (click)="goBack()" class="btn back">
+      <i class="mdi mdi-arrow-left"></i> Back
+    </button>
+  </header>
+
+  <!-- QUESTIONS -->
+  <section class="questions">
+    <article
+      *ngFor="let q of exam()!.questions; let i = index"
+      class="question-card"
+    >
+      <div class="q-head">
+        <h3 class="q-title">
+          <span class="q-index">#{{ i + 1 }}</span>
+          {{ q.title }}
+        </h3>
+
+        <span
+          [ngClass]="{
+            single: q.type === 'single',
+            multiple: q.type === 'multiple',
+            text: q.type === 'text' || !q.answers.length
+          }"
+          class="badge"
+        >
+          <i
+            [ngClass]="{
+              'mdi-radiobox-marked': q.type === 'single',
+              'mdi-checkbox-multiple-marked-outline': q.type === 'multiple',
+              'mdi-text-box-outline': q.type === 'text' || !q.answers.length
+            }"
+            class="mdi"
+          ></i>
+          {{ q.type }}
+        </span>
+
+      </div>
+
+      <!-- Single -->
+      <div *ngIf="q.type === 'single'" class="options">
+        <label
+          *ngFor="let a of q.answers"
+          [class.selected]="answers()[q.id] === a.id"
+          class="option"
+        >
+          <input
+            (change)="setSingleAnswer(q.id, a.id)"
+            [disabled]="submitted()"
+            [name]="'q' + q.id"
+            [value]="a.id"
+            type="radio"
+          />
+          <div class="custom-radio"></div>
+          <span class="label-text">{{ a.text }}</span>
+        </label>
+      </div>
+
+      <!-- Multiple -->
+      <div *ngIf="q.type === 'multiple'" class="options">
+        <label
+          *ngFor="let a of q.answers"
+          [class.selected]="answers()[q.id]?.includes(a.id)"
+          class="option"
+        >
+          <input
+            (change)="toggleMultipleAnswer(q.id, a.id)"
+            [disabled]="submitted()"
+            type="checkbox"
+          />
+          <div class="custom-checkbox"></div>
+          <span class="label-text">{{ a.text }}</span>
+        </label>
+      </div>
+
+      <!-- Open -->
+      <div *ngIf="q.type === 'text'" class="open-answer">
+        <textarea
+          (input)="setTextAnswer(q.id, $any($event.target).value)"
+          [disabled]="submitted()"
+        ></textarea>
+      </div>
+    </article>
+  </section>
+
+  <!-- ACTIONS -->
+  <div class="exam-actions">
+    <button (click)="submitExam()" *ngIf="!submitted()" class="btn primary">
+      <i class="mdi mdi-send-outline"></i> Submit
+    </button>
+
+    <div *ngIf="submitted()" class="score-box">
+      <i class="mdi mdi-trophy-outline"></i>
+      {{ score() }} / {{ totalQuestions() }} correct
+    </div>
+  </div>
+</div>
+
+<ng-template #notFound>
+  <div class="not-found">
+    <i class="mdi mdi-file-remove-outline"></i>
+    <p>Exam not found.</p>
+  </div>
+</ng-template>

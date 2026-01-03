@@ -25,6 +25,7 @@
               }
             ],
             "styles": [
+              "node_modules/@mdi/font/css/materialdesignicons.min.css",
               "src/styles.css"
             ]
           },

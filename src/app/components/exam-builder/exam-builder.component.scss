@@ -1,0 +1,64 @@
+.exam-builder {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+
+  
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.8rem;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.6rem 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &.add {
+      background: #eef2ff;
+      color: #374151;
+      border: 1px solid rgba(102, 126, 234, 0.3);
+
+      &:hover {
+        background: #667eea;
+        color: white;
+      }
+    }
+
+    &.import {
+      background: #f8fafc;
+      color: #334155;
+      border: 1px dashed #cbd5e1;
+
+      &:hover {
+        background: #e2e8f0;
+        border-color: #94a3b8;
+      }
+
+      &:active {
+        transform: translateY(1px);
+      }
+    }
+
+    &.save {
+      background: #667eea;
+      color: white;
+
+      &:hover {
+        background: #5a67d8;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+}

@@ -1,0 +1,149 @@
+$violet: #6366f1;
+$violet-dark: #4f46e5;
+$gray: #6b7280;
+$line: #e5e7eb;
+$muted-bg: #f3f4f6;
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  background: white;
+  border-bottom: 1px solid $line;
+
+  .header-left {
+    .greeting {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #1f2937;
+      margin: 0;
+    }
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .btn-primary {
+      background: $violet;
+      color: white;
+      border-radius: 0.5rem;
+      padding: 0.55rem 1.1rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-decoration: none;
+      transition: background 0.2s;
+
+      &:hover {
+        background: $violet-dark;
+      }
+    }
+
+    .search-box {
+      position: relative;
+
+      input {
+        padding: 0.625rem 2.5rem 0.625rem 1rem;
+        border: 1px solid $line;
+        border-radius: 0.5rem;
+        width: 240px;
+
+        &:focus {
+          border-color: $violet;
+          outline: none;
+        }
+      }
+
+      .search-icon {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+      }
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      color: $gray;
+
+      &:hover {
+        background: $muted-bg;
+      }
+
+      i {
+        font-size: 1.25rem;
+      }
+    }
+
+    .avatar-menu {
+      position: relative;
+      cursor: pointer;
+
+      .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+      }
+
+      .dropdown-menu {
+        position: absolute;
+        top: calc(100% + 0.5rem);
+        right: 0;
+        background: white;
+        border-radius: 0.75rem;
+        min-width: 280px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        border: 1px solid $line;
+        overflow: hidden;
+        z-index: 1000;
+
+        .menu-header {
+          padding: 1.25rem;
+          display: flex;
+          gap: 0.875rem;
+          background: #f9fafb;
+        }
+
+        .menu-divider {
+          height: 1px;
+          background: $line;
+        }
+
+        .menu-item {
+          width: 100%;
+          padding: 0.875rem 1.25rem;
+          background: none;
+          border: none;
+          display: flex;
+          gap: 0.75rem;
+          cursor: pointer;
+
+          &:hover {
+            background: #f3f4f6;
+          }
+
+          &.logout {
+            color: #dc2626;
+
+            &:hover {
+              background: #fef2f2;
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+<aside class="sidebar">
+
+  <div class="logo">
+    <div class="logo-icon">
+      <i class="mdi mdi-book-open-page-variant"></i>
+    </div>
+  </div>
+
+  <nav class="nav-menu">
+    <a
+      *ngFor="let item of menuItems"
+      [routerLink]="item.path"
+      routerLinkActive="active"
+      class="nav-item"
+    >
+      <i class="mdi" [ngClass]="item.icon"></i>
+      <span class="nav-label">{{ item.label }}</span>
+    </a>
+  </nav>
+
+</aside>

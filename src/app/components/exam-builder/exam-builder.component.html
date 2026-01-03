@@ -1,0 +1,36 @@
+<section class="exam-builder card">
+  <h2 class="section-title">
+    <i class="mdi mdi-note-edit-outline"></i>
+    Exam Builder
+  </h2>
+
+  <div class="questions-list">
+    <app-question-item
+      (remove)="removeQuestion(i)"
+      *ngFor="let q of questions; let i = index"
+      [question]="q"
+    />
+  </div>
+
+  <div class="actions">
+    <button (click)="addQuestion()" class="btn add">
+      <i class="mdi mdi-plus-circle-outline"></i>
+      Add Question
+    </button>
+
+    <label class="btn import">
+      <i class="mdi mdi-upload-outline"></i>
+      Import CSV
+      <input (change)="importCsv($event)" accept=".csv" hidden type="file" />
+    </label>
+
+    <button
+      (click)="saveExam()"
+      [disabled]="!questions.length"
+      class="btn save"
+    >
+      <i class="mdi mdi-content-save-outline"></i>
+      Save Exam
+    </button>
+  </div>
+</section>

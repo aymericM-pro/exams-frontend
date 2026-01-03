@@ -1,0 +1,80 @@
+<header class="header">
+
+  <div class="header-left">
+    <h2 class="greeting" *ngIf="isAuthenticated(); else guest">
+      Hi, {{ userName() }}
+    </h2>
+
+    <ng-template #guest>
+      <h2 class="greeting">Welcome 👋</h2>
+    </ng-template>
+  </div>
+
+  <div class="header-right">
+
+    <a
+      *ngIf="!isAuthenticated()"
+      routerLink="/signin"
+      class="btn-primary"
+    >
+      Login
+    </a>
+
+    <ng-container>
+
+      <div class="search-box">
+        <input type="text" placeholder="Search..." />
+        <i class="mdi mdi-magnify search-icon"></i>
+      </div>
+
+      <button class="icon-btn">
+        <i class="mdi mdi-bell-outline"></i>
+      </button>
+
+      <button class="icon-btn">
+        <i class="mdi mdi-cog-outline"></i>
+      </button>
+
+      <div class="avatar-menu" (click)="toggleMenu($event)">
+
+        <div class="avatar">
+          <span>{{ userInitials() }}</span>
+        </div>
+
+        <div *ngIf="menuOpen()" class="dropdown-menu">
+
+          <div class="menu-header">
+            <div class="menu-avatar">
+              <span>{{ userInitials() }}</span>
+            </div>
+
+            <div class="menu-user-info">
+              <p class="menu-user-name">{{ userName() }}</p>
+              <p class="menu-user-email">{{ userEmail() }}</p>
+            </div>
+          </div>
+
+          <div class="menu-divider"></div>
+
+          <button class="menu-item" (click)="handleProfile()">
+            <i class="mdi mdi-account-outline"></i>
+            <span>Profile</span>
+          </button>
+
+          <button class="menu-item" (click)="handleSettings()">
+            <i class="mdi mdi-cog-outline"></i>
+            <span>Settings</span>
+          </button>
+
+          <div class="menu-divider"></div>
+
+          <button class="menu-item logout" (click)="handleLogout()">
+            <i class="mdi mdi-logout"></i>
+            <span>Logout</span>
+          </button>
+        </div>
+      </div>
+
+    </ng-container>
+  </div>
+</header>

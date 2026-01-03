@@ -1,0 +1,23 @@
+<div class="answer-item">
+  <input
+    (input)="updateText($any($event.target).value)"
+    [value]="answer.text"
+    class="input"
+    placeholder="Answer text"
+    type="text"
+  />
+
+  <label class="checkbox">
+    <input
+      (change)="toggleCorrect()"
+      [attr.name]="type === 'single' ? 'correct-answer' : null"
+      [checked]="answer.correct"
+      [type]="type === 'single' ? 'radio' : 'checkbox'"
+    />
+    <span>Correct</span>
+  </label>
+
+  <button (click)="remove.emit()" class="remove" type="button">
+    <i class="mdi mdi-close-circle-outline"></i>
+  </button>
+</div>
