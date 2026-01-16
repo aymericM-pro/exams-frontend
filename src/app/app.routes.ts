@@ -13,22 +13,10 @@ export const routes: Routes = [
   {
     path: 'exams',
     children: [
-      {
-        path: '',
-        component: ExamListComponent,
-      },
-      {
-        path: 'builder',
-        component: ExamBuilderComponent,
-      },
-      {
-        path: ':id',
-        component: ExamDetailComponent,
-      },
-      {
-        path: 'upcoming',
-        component: UpcomingExamsComponent,
-      },
+      { path: '', component: ExamListComponent },
+      { path: 'builder', component: ExamBuilderComponent },
+      { path: 'upcoming', component: UpcomingExamsComponent },
+      { path: ':id', component: ExamDetailComponent },
     ],
   },
   {

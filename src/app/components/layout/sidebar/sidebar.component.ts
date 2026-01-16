@@ -7,6 +7,7 @@ interface MenuItem {
   icon: string;
   label: string;
   path: string;
+  exact: boolean;
 }
 
 @Component({
@@ -23,12 +24,14 @@ export class SidebarComponent {
       icon: 'mdi-file-document-outline',
       label: 'Exams',
       path: '/exams',
+      exact: true,
     },
     {
       id: 'upcoming',
       icon: 'mdi-play-circle-outline',
       label: 'Upcoming Exams',
       path: '/exams/upcoming',
+      exact: true,
     },
   ];
 }

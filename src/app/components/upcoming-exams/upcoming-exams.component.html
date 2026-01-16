@@ -1,5 +1,6 @@
 <div class="exams-page">
 
+  <!-- HEADER -->
   <header class="page-header">
     <div class="header-content">
       <div class="header-info">
@@ -11,34 +12,39 @@
     </div>
   </header>
 
+  <!-- LOADING -->
   @if (loading()) {
     <div class="empty-state">
       Loading exams...
     </div>
   }
 
+  <!-- ERROR -->
   @if (!loading() && error()) {
     <div class="empty-state">
       {{ error() }}
     </div>
   }
 
+  <!-- LIST -->
   @if (!loading() && !error() && exams().length > 0) {
     <section class="exam-list">
 
       @for (exam of exams(); track exam.examId) {
         <div class="exam-card">
 
+          <!-- HEADER -->
           <div class="exam-header">
             <div class="exam-info">
               <i class="mdi mdi-file-document-outline icon"></i>
               <div>
                 <h3>{{ exam.title }}</h3>
-                <p>Semester {{ exam.semester }}</p>
+                <p class="semester">Semester {{ exam.semester }}</p>
               </div>
             </div>
           </div>
 
+          <!-- META -->
           <div class="exam-meta">
             <div class="meta-item">
               <i class="mdi mdi-calendar-outline"></i>
@@ -46,6 +52,7 @@
             </div>
           </div>
 
+          <!-- ACTIONS -->
           <div class="exam-actions">
             <button
               type="button"
@@ -58,7 +65,7 @@
 
             <button
               type="button"
-              class="btn add"
+              class="btn start"
               (click)="startExam(exam.examId)"
             >
               <i class="mdi mdi-play-circle-outline"></i>
@@ -72,6 +79,7 @@
     </section>
   }
 
+  <!-- EMPTY -->
   @if (!loading() && !error() && exams().length === 0) {
     <div class="empty-state">
       <i class="mdi mdi-file-remove-outline"></i>
