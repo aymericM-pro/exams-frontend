@@ -1,0 +1,132 @@
+@if (exam()) {
+  <div class="exam-detail">
+
+    <!-- HEADER -->
+    <header class="exam-header">
+      <div>
+        <h1 class="title">
+          <i class="mdi mdi-file-question-outline"></i>
+          {{ exam()!.title }}
+        </h1>
+
+        <p class="subtitle">{{ exam()!.description }}</p>
+
+        <div class="chips">
+          <span class="chip">
+            <i class="mdi mdi-calendar-outline"></i>
+            {{ createdAt() }}
+          </span>
+
+          <span class="chip">
+            <i class="mdi mdi-book-multiple-outline"></i>
+            {{ totalQuestions() }} questions
+          </span>
+
+          <span class="chip">
+            <i class="mdi mdi-format-list-bulleted-type"></i>
+            {{ totalMCQ() }} MCQ
+          </span>
+
+          <span class="chip">
+            <i class="mdi mdi-text-long"></i>
+            {{ totalOpen() }} open
+          </span>
+        </div>
+      </div>
+
+      <button (click)="goBack()" class="btn back">
+        <i class="mdi mdi-arrow-left"></i>
+        Back
+      </button>
+    </header>
+
+    <!-- QUESTIONS -->
+    <section class="questions">
+      @for (q of exam()!.questions; track q; let i = $index) {
+        <article class="question-card">
+
+          <!-- QUESTION HEADER -->
+          <div class="q-head">
+            <h3 class="q-title">
+              <span class="q-index">#{{ i + 1 }}</span>
+              {{ q.title }}
+            </h3>
+          </div>
+
+          <!-- SINGLE -->
+          @if (q.type === 'single') {
+            <div class="options">
+              @for (a of q.answers; track a; let j = $index) {
+                <label
+                  class="option"
+                  [class.selected]="answers()[i] === String(j)"
+                >
+                  <input
+                    type="radio"
+                    [name]="'q' + i"
+                    [disabled]="submitted()"
+                    (change)="setSingleAnswer(i, j)"
+                  />
+                  <div class="custom-radio"></div>
+                  <span class="label-text">{{ a.text }}</span>
+                </label>
+              }
+            </div>
+          }
+
+          <!-- MULTIPLE -->
+          @if (q.type === 'multiple') {
+            <div class="options">
+              @for (a of q.answers; track a; let j = $index) {
+                <label
+                  class="option"
+                  [class.selected]="isMultipleSelected(i, j)"
+                >
+                  <input
+                    type="checkbox"
+                    [disabled]="submitted()"
+                    (change)="toggleMultipleAnswer(i, j)"
+                  />
+                  <div class="custom-checkbox"></div>
+                  <span class="label-text">{{ a.text }}</span>
+                </label>
+              }
+            </div>
+          }
+
+          <!-- TEXT -->
+          @if (q.type === 'text') {
+            <div class="open-answer">
+              <textarea
+                [disabled]="submitted()"
+                (input)="setTextAnswer(i, $any($event.target).value)"
+              ></textarea>
+            </div>
+          }
+
+        </article>
+      }
+    </section>
+
+    <!-- ACTIONS -->
+    <div class="exam-actions">
+      @if (!submitted()) {
+        <button class="btn primary" (click)="submitExam()">
+          <i class="mdi mdi-send-outline"></i>
+          Submit
+        </button>
+      } @else {
+        <div class="score-box">
+          <i class="mdi mdi-trophy-outline"></i>
+          {{ score() }} / {{ totalQuestions() }} correct
+        </div>
+      }
+    </div>
+
+  </div>
+} @else {
+  <div class="not-found">
+    <i class="mdi mdi-file-remove-outline"></i>
+    <p>Exam not found.</p>
+  </div>
+}

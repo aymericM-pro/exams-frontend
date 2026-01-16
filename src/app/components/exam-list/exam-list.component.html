@@ -16,18 +16,18 @@
     </div>
   </header>
   <!-- FILTERS -->
-  <div class="semester-filters" *ngIf="exams().length > 0">
+  <div *ngIf="exams().length > 0" class="semester-filters">
     <button
-      *ngFor="let s of semesters"
-      class="semester-btn"
-      [class.active]="selectedSemester() === s"
       (click)="selectSemester(s)"
+      *ngFor="let s of semesters"
+      [class.active]="selectedSemester() === s"
+      class="semester-btn"
     >
       {{ s }}
     </button>
   </div>
 
-  <section class="exam-list" *ngIf="filteredExams().length > 0">
+  <section *ngIf="filteredExams().length > 0" class="exam-list">
     <div
       *ngFor="let exam of filteredExams()"
       class="exam-card"
@@ -41,7 +41,9 @@
           </div>
         </div>
 
-        <button class="delete" (click)="deleteExam(exam.id)">
+        <button (click)="deleteExam(exam.examId)" class="delete">
+          html
+          Copy code
           <i class="mdi mdi-delete-outline"></i>
         </button>
       </div>
@@ -65,7 +67,7 @@
 
       <!-- ACTION -->
       <div class="exam-actions">
-        <button class="btn view" (click)="openExam(exam.id)">
+        <button (click)="openExam(exam.examId)" class="btn view">
           <i class="mdi mdi-eye-outline"></i>
           View Exam
         </button>

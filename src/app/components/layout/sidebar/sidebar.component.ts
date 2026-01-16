@@ -14,11 +14,21 @@ interface MenuItem {
   standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './sidebar.component.html',
-  styleUrl: './sidebar.component.scss'
+  styleUrl: './sidebar.component.scss',
 })
 export class SidebarComponent {
-
   menuItems: MenuItem[] = [
-    { id: 'exams', icon: 'mdi-file-document-outline', label: 'Exams', path: '/exams' },
+    {
+      id: 'exams',
+      icon: 'mdi-file-document-outline',
+      label: 'Exams',
+      path: '/exams',
+    },
+    {
+      id: 'upcoming',
+      icon: 'mdi-play-circle-outline',
+      label: 'Upcoming Exams',
+      path: '/exams/upcoming',
+    },
   ];
 }

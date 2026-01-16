@@ -1,0 +1,82 @@
+<div class="exams-page">
+
+  <header class="page-header">
+    <div class="header-content">
+      <div class="header-info">
+        <h1 class="page-title">Upcoming Exams</h1>
+        <p class="page-subtitle">
+          Exams available to be started
+        </p>
+      </div>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="empty-state">
+      Loading exams...
+    </div>
+  }
+
+  @if (!loading() && error()) {
+    <div class="empty-state">
+      {{ error() }}
+    </div>
+  }
+
+  @if (!loading() && !error() && exams().length > 0) {
+    <section class="exam-list">
+
+      @for (exam of exams(); track exam.examId) {
+        <div class="exam-card">
+
+          <div class="exam-header">
+            <div class="exam-info">
+              <i class="mdi mdi-file-document-outline icon"></i>
+              <div>
+                <h3>{{ exam.title }}</h3>
+                <p>Semester {{ exam.semester }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="exam-meta">
+            <div class="meta-item">
+              <i class="mdi mdi-calendar-outline"></i>
+              {{ exam.createdAt | date:'mediumDate' }}
+            </div>
+          </div>
+
+          <div class="exam-actions">
+            <button
+              type="button"
+              class="btn view"
+              (click)="openExam(exam.examId)"
+            >
+              <i class="mdi mdi-eye-outline"></i>
+              View
+            </button>
+
+            <button
+              type="button"
+              class="btn add"
+              (click)="startExam(exam.examId)"
+            >
+              <i class="mdi mdi-play-circle-outline"></i>
+              Start
+            </button>
+          </div>
+
+        </div>
+      }
+
+    </section>
+  }
+
+  @if (!loading() && !error() && exams().length === 0) {
+    <div class="empty-state">
+      <i class="mdi mdi-file-remove-outline"></i>
+      <p>No upcoming exams.</p>
+    </div>
+  }
+
+</div>
