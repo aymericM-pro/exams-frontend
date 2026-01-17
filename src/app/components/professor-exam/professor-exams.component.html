@@ -1,0 +1,93 @@
+<div class="exams-page">
+
+  <header class="page-header">
+    <div class="header-content">
+      <div class="header-info">
+        <h1 class="page-title">My Exams</h1>
+        <p class="page-subtitle">
+          Exams you created as a professor
+        </p>
+      </div>
+
+      <a class="btn add" routerLink="/exams/builder">
+        <i class="mdi mdi-plus"></i>
+        Create Exam
+      </a>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="empty-state">Loading exams...</div>
+  }
+
+  @if (!loading() && error()) {
+    <div class="empty-state">{{ error() }}</div>
+  }
+
+  @if (!loading() && !error() && exams().length > 0) {
+    <section class="exam-list">
+
+      @for (exam of exams(); track exam.examId) {
+        <div class="exam-card">
+
+          <div class="exam-header">
+            <div class="exam-info">
+              <i class="mdi mdi-file-document-outline icon"></i>
+              <div>
+                <h3>{{ exam.title }}</h3>
+                <p>{{ exam.description }}</p>
+              </div>
+            </div>
+
+            <button class="delete" (click)="deleteExam(exam.examId)">
+              <i class="mdi mdi-delete-outline"></i>
+            </button>
+          </div>
+
+          <div class="exam-meta">
+            <div class="meta-item">
+              <i class="mdi mdi-calendar-outline"></i>
+              {{ exam.createdAt | date }}
+            </div>
+
+            <div class="meta-item">
+              <i class="mdi mdi-book-multiple-outline"></i>
+              {{ exam.questions.length }} questions
+            </div>
+
+            <div class="meta-item">
+              <i class="mdi mdi-tag-outline"></i>
+              {{ exam.semester }}
+            </div>
+          </div>
+
+          <div class="exam-actions">
+            <button class="btn view" (click)="openExam(exam.examId)">
+              <i class="mdi mdi-eye-outline"></i>
+              View
+            </button>
+
+            <button class="btn edit" (click)="editExam(exam.examId)">
+              <i class="mdi mdi-pencil-outline"></i>
+              Edit
+            </button>
+          </div>
+
+        </div>
+      }
+
+    </section>
+  }
+
+  @if (!loading() && !error() && exams().length === 0) {
+    <div class="empty-state">
+      <i class="mdi mdi-file-plus-outline"></i>
+      <p>You haven’t created any exam yet.</p>
+
+      <a class="btn add" routerLink="/exams/builder">
+        <i class="mdi mdi-plus"></i>
+        Create Exam
+      </a>
+    </div>
+  }
+</div>

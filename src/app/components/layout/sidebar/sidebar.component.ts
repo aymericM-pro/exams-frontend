@@ -33,5 +33,12 @@ export class SidebarComponent {
       path: '/exams/upcoming',
       exact: true,
     },
+    {
+      id: 'professor',
+      icon: 'mdi-teach-outline',
+      label: 'My Exams',
+      path: '/exams/professor',
+      exact: true,
+    },
   ];
 }
