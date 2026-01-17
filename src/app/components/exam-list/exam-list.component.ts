@@ -1,7 +1,9 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { ExamService } from '../../services/exam.service';
+import { NavigationService } from '../../services/navigation.service';
+import { AppRoute } from '../../AppRoute';
 
 @Component({
   selector: 'app-exam-list',
@@ -11,16 +13,19 @@ import { ExamService } from '../../services/exam.service';
   styleUrl: './exam-list.component.scss',
 })
 export class ExamListComponent {
-  semesters = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7'];
-  selectedSemester = signal('S1');
-  private readonly examService = inject(ExamService);
-  exams = this.examService.exams;
-  filteredExams = computed(() =>
+  // ===== UI state =====
+  readonly semesters = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7'];
+  readonly selectedSemester = signal('S1');
+  readonly filteredExams = computed(() =>
     this.exams().filter((e) => e.semester === this.selectedSemester()),
   );
-  loading = this.examService.loading;
-  error = this.examService.error;
-  private readonly router = inject(Router);
+  // ===== services =====
+  private readonly examService = inject(ExamService);
+  // ===== data =====
+  readonly exams = this.examService.exams;
+  readonly loading = this.examService.loading;
+  readonly error = this.examService.error;
+  private readonly navigation = inject(NavigationService);
 
   constructor() {
     this.examService.loadExams();
@@ -30,12 +35,13 @@ export class ExamListComponent {
     });
   }
 
-  selectSemester(s: string): void {
-    this.selectedSemester.set(s);
+  // ===== actions =====
+  selectSemester(semester: string): void {
+    this.selectedSemester.set(semester);
   }
 
   openExam(id: string): void {
-    this.router.navigate(['/exams', id]);
+    this.navigation.goTo(`${AppRoute.EXAMS}/${id}` as AppRoute);
   }
 
   deleteExam(id: string): void {
