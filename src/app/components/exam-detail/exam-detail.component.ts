@@ -2,6 +2,8 @@ import { Component, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ExamService } from '../../services/exam.service';
+import { AppRoute } from '../../AppRoute';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-exam-detail',
@@ -15,6 +17,12 @@ export class ExamDetailComponent {
   readonly answers = signal<Record<string, string | string[]>>({});
   readonly submitted = signal(false);
   readonly score = signal(0);
+  protected readonly String = String;
+  private readonly route = inject(ActivatedRoute);
+  readonly examId = this.route.snapshot.paramMap.get('id');
+  private readonly router = inject(Router);
+  private readonly examService = inject(ExamService);
+  readonly exam = this.examService.exam;
   readonly createdAt = computed(() => {
     const exam = this.exam();
     return exam ? new Date(exam.createdAt).toLocaleDateString() : '';
@@ -26,12 +34,7 @@ export class ExamDetailComponent {
   readonly totalOpen = computed(
     () => this.exam()?.questions.filter((q) => !q.answers?.length).length ?? 0,
   );
-  protected readonly String = String;
-  private readonly route = inject(ActivatedRoute);
-  readonly examId = this.route.snapshot.paramMap.get('id');
-  private readonly router = inject(Router);
-  private readonly examService = inject(ExamService);
-  readonly exam = this.examService.exam;
+  private readonly navigation = inject(NavigationService);
 
   constructor() {
     if (this.examId) {
@@ -43,9 +46,8 @@ export class ExamDetailComponent {
     });
   }
 
-  // ===== navigation =====
   goBack(): void {
-    this.router.navigate(['/exams']);
+    this.navigation.goTo(AppRoute.EXAMS);
   }
 
   // ===== answers handlers =====
