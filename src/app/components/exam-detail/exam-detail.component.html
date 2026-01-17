@@ -42,7 +42,7 @@
 
     <!-- QUESTIONS -->
     <section class="questions">
-      @for (q of exam()!.questions; track q; let i = $index) {
+      @for (q of exam()!.questions; track i; let i = $index) {
         <article class="question-card">
 
           <!-- QUESTION HEADER -->
@@ -56,15 +56,15 @@
           <!-- SINGLE -->
           @if (q.type === 'single') {
             <div class="options">
-              @for (a of q.answers; track a; let j = $index) {
+              @for (a of q.answers; track j; let j = $index) {
                 <label
                   class="option"
                   [class.selected]="answers()[i] === String(j)"
+                  [class.correct]="shouldHighlightCorrect(i, j)"
                 >
                   <input
                     type="radio"
-                    [name]="'q' + i"
-                    [disabled]="submitted()"
+                    [disabled]="isReadonly()"
                     (change)="setSingleAnswer(i, j)"
                   />
                   <div class="custom-radio"></div>
@@ -77,14 +77,15 @@
           <!-- MULTIPLE -->
           @if (q.type === 'multiple') {
             <div class="options">
-              @for (a of q.answers; track a; let j = $index) {
+              @for (a of q.answers; track j; let j = $index) {
                 <label
                   class="option"
                   [class.selected]="isMultipleSelected(i, j)"
+                  [class.correct]="shouldHighlightCorrect(i, j)"
                 >
                   <input
                     type="checkbox"
-                    [disabled]="submitted()"
+                    [disabled]="isReadonly()"
                     (change)="toggleMultipleAnswer(i, j)"
                   />
                   <div class="custom-checkbox"></div>
@@ -98,7 +99,7 @@
           @if (q.type === 'text') {
             <div class="open-answer">
               <textarea
-                [disabled]="submitted()"
+                [disabled]="isReadonly()"
                 (input)="setTextAnswer(i, $any($event.target).value)"
               ></textarea>
             </div>
@@ -110,12 +111,14 @@
 
     <!-- ACTIONS -->
     <div class="exam-actions">
-      @if (!submitted()) {
+      @if (canSubmit()) {
         <button class="btn primary" (click)="submitExam()">
           <i class="mdi mdi-send-outline"></i>
           Submit
         </button>
-      } @else {
+      }
+
+      @if (submitted()) {
         <div class="score-box">
           <i class="mdi mdi-trophy-outline"></i>
           {{ score() }} / {{ totalQuestions() }} correct

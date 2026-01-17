@@ -26,7 +26,9 @@ export class ProfessorExamsComponent {
   }
 
   openExam(id: string): void {
-    this.router.navigate(['/exams', id]);
+    this.router.navigate(['/exams', id], {
+      queryParams: { mode: 'view' },
+    });
   }
 
   editExam(id: string): void {

@@ -11,14 +11,19 @@ import { ExamService } from '../../services/exam.service';
   styleUrl: './exam-detail.component.scss',
 })
 export class ExamDetailComponent {
+  // ===== mode =====
+  readonly mode = signal<'take' | 'view' | 'review'>('take');
+  readonly isReadonly = computed(() => this.mode() === 'view' || this.mode() === 'review');
+
   // ===== state =====
-  readonly answers = signal<Record<string, string | string[]>>({});
+  readonly answers = signal<Record<number, string | string[]>>({});
   readonly submitted = signal(false);
+  readonly canSubmit = computed(() => this.mode() === 'take' && !this.submitted());
   readonly score = signal(0);
-  readonly createdAt = computed(() => {
-    const exam = this.exam();
-    return exam ? new Date(exam.createdAt).toLocaleDateString() : '';
-  });
+  // ===== computed UI =====
+  readonly createdAt = computed(() =>
+    this.exam() ? new Date(this.exam()!.createdAt).toLocaleDateString() : '',
+  );
   readonly totalQuestions = computed(() => this.exam()?.questions.length ?? 0);
   readonly totalMCQ = computed(
     () => this.exam()?.questions.filter((q) => q.answers?.length).length ?? 0,
@@ -27,6 +32,7 @@ export class ExamDetailComponent {
     () => this.exam()?.questions.filter((q) => !q.answers?.length).length ?? 0,
   );
   protected readonly String = String;
+  // ===== routing & services =====
   private readonly route = inject(ActivatedRoute);
   readonly examId = this.route.snapshot.paramMap.get('id');
   private readonly router = inject(Router);
@@ -34,12 +40,29 @@ export class ExamDetailComponent {
   readonly exam = this.examService.exam;
 
   constructor() {
+    // ---- read mode ----
+    const modeParam = this.route.snapshot.queryParamMap.get('mode');
+    if (modeParam === 'view' || modeParam === 'review') {
+      this.mode.set(modeParam);
+    }
+
+    // ---- load exam ----
     if (this.examId) {
       this.examService.loadExamById(this.examId);
     }
 
+    // ---- log loaded exam ----
     effect(() => {
-      console.log('Exam loaded:', this.exam());
+      if (this.exam()) {
+        console.log('📘 Exam loaded:', this.exam());
+      }
+    });
+
+    // ---- prefill correct answers in review mode ----
+    effect(() => {
+      if (this.mode() === 'review' && this.exam()) {
+        this.prefillCorrectAnswers();
+      }
     });
   }
 
@@ -48,50 +71,61 @@ export class ExamDetailComponent {
     this.router.navigate(['/exams']);
   }
 
-  // ===== answers handlers =====
-  setSingleAnswer(questionId: string | number, answerId: string | number): void {
+  // ===== answer helpers =====
+  setSingleAnswer(questionIndex: number, answerIndex: number): void {
+    if (this.isReadonly()) return;
+
     this.answers.update((v) => ({
       ...v,
-      [questionId]: String(answerId),
+      [questionIndex]: String(answerIndex),
     }));
   }
 
-  toggleMultipleAnswer(questionId: string | number, answerId: string | number): void {
-    const current = (this.answers()[questionId] as string[]) ?? [];
+  toggleMultipleAnswer(questionIndex: number, answerIndex: number): void {
+    if (this.isReadonly()) return;
+
+    const current = (this.answers()[questionIndex] as string[]) ?? [];
 
     this.answers.update((v) => ({
       ...v,
-      [questionId]: current.includes(String(answerId))
-        ? current.filter((id) => id !== String(answerId))
-        : [...current, String(answerId)],
+      [questionIndex]: current.includes(String(answerIndex))
+        ? current.filter((id) => id !== String(answerIndex))
+        : [...current, String(answerIndex)],
     }));
   }
 
   isMultipleSelected(questionIndex: number, answerIndex: number): boolean {
-    const value = this.answers()[questionIndex.toString()];
-    return Array.isArray(value) && value.includes(answerIndex.toString());
+    const value = this.answers()[questionIndex];
+    return Array.isArray(value) && value.includes(String(answerIndex));
   }
 
-  setTextAnswer(questionId: string | number, value: string): void {
-    this.answers.update((v) => ({ ...v, [questionId]: value }));
+  setTextAnswer(questionIndex: number, value: string): void {
+    if (this.isReadonly()) return;
+
+    this.answers.update((v) => ({
+      ...v,
+      [questionIndex]: value,
+    }));
   }
 
   // ===== submit =====
   submitExam(): void {
+    if (this.isReadonly()) return;
+
     const exam = this.exam();
     if (!exam) return;
 
     let correct = 0;
 
-    exam.questions.forEach((q) => {
-      if (!q.questionId || !q.answers?.length) return;
+    exam.questions.forEach((q, qi) => {
+      if (!q.answers?.length) return;
 
       const correctIds = q.answers
-        .filter((a) => a.correct && a.answerId)
-        .map((a) => a.answerId!)
+        .map((a, ai) => (a.correct ? String(ai) : null))
+        .filter(Boolean)
         .sort();
 
-      const userValue = this.answers()[q.questionId];
+      const userValue = this.answers()[qi];
       const userIds = Array.isArray(userValue) ? [...userValue].sort() : [userValue];
 
       if (JSON.stringify(correctIds) === JSON.stringify(userIds)) {
@@ -101,5 +135,40 @@ export class ExamDetailComponent {
 
     this.score.set(correct);
     this.submitted.set(true);
+  }
+
+  // ===== view / review helpers =====
+  isCorrectAnswer(questionIndex: number, answerIndex: number): boolean {
+    const exam = this.exam();
+    if (!exam) return false;
+
+    return !!exam.questions[questionIndex]?.answers?.[answerIndex]?.correct;
+  }
+
+  shouldHighlightCorrect(questionIndex: number, answerIndex: number): boolean {
+    return this.mode() === 'view' && this.isCorrectAnswer(questionIndex, answerIndex);
+  }
+
+  private prefillCorrectAnswers(): void {
+    const exam = this.exam();
+    if (!exam) return;
+
+    const prefilled: Record<number, string | string[]> = {};
+
+    exam.questions.forEach((q, qi) => {
+      if (!q.answers?.length) return;
+
+      const correctIndexes = q.answers
+        .map((a, ai) => (a.correct ? String(ai) : null))
+        .filter(Boolean) as string[];
+
+      if (q.type === 'single') {
+        prefilled[qi] = correctIndexes[0] ?? '';
+      } else if (q.type === 'multiple') {
+        prefilled[qi] = correctIndexes;
+      }
+    });
+
+    this.answers.set(prefilled);
   }
 }
