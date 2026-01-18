@@ -11,7 +11,7 @@
       <!-- LEVEL -->
       <div class="form-group">
         <label>Class level</label>
-        <select (change)="level.set($any($event.target).value)">
+        <select (change)="level.set($any($event.target).value)" [value]="level()">
           <option value="L1">L1</option>
           <option value="L2">L2</option>
           <option value="L3">L3</option>
@@ -22,19 +22,30 @@
 
       <div class="form-group">
         <label>Academic year</label>
-        <input (input)="year.set($any($event.target).value)" type="text" />
+        <input
+          (input)="year.set($any($event.target).value)"
+          [value]="year()"
+          type="text"
+        />
       </div>
 
       <div class="form-group">
         <label>Description</label>
-        <textarea (input)="description.set($any($event.target).value)"
-                  rows="3">
+        <textarea
+          (input)="description.set($any($event.target).value)"
+          [value]="description()"
+          rows="3">
         </textarea>
       </div>
 
+      <!-- STUDENTS -->
       <div class="form-group">
         <label>Add students</label>
-        <input (input)="searchStudents($any($event.target).value)" type="text" />
+        <input
+          (input)="studentQuery.set($any($event.target).value)"
+          [value]="studentQuery()"
+          type="text"
+        />
 
         @if (filteredStudents().length > 0) {
           <ul>
@@ -56,9 +67,14 @@
         </div>
       </div>
 
+      <!-- PROFESSORS -->
       <div class="form-group">
         <label>Add professors</label>
-        <input (input)="searchProfessors($any($event.target).value)" type="text" />
+        <input
+          (input)="professorQuery.set($any($event.target).value)"
+          [value]="professorQuery()"
+          type="text"
+        />
 
         @if (filteredProfessors().length > 0) {
           <ul>
@@ -80,6 +96,7 @@
         </div>
       </div>
 
+      <!-- ACTIONS -->
       <div class="form-actions">
         <button (click)="cancel()" type="button">Cancel</button>
         <button [disabled]="submitting()" type="submit">Create class</button>

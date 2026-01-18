@@ -6,19 +6,11 @@
 
       <div class="header-info">
         <h1 class="page-title">
-          @if (classDetail()) {
-            {{ classDetail()!.name }}
-          } @else {
-            Class Students
-          }
+          Class Students
         </h1>
 
         <p class="page-subtitle">
-          @if (classDetail()) {
-            {{ classDetail()!.year }} – enrolled students
-          } @else {
-            View and manage students enrolled in this class
-          }
+          View and manage students enrolled in this class
         </p>
       </div>
 
@@ -101,13 +93,13 @@
 
             <div class="detail-item">
               <span class="label">Age</span>
-              <span class="value">{{ student.age }} years</span>
+              <!--              <span class="value">{{ student.age }} years</span>-->
             </div>
 
             <div class="detail-item">
               <span class="label">Birth date</span>
               <span class="value">
-                {{ student.birthDate | date:'longDate' }}
+<!--                {{ student.birthDate | date:'longDate' }}-->
               </span>
             </div>
 

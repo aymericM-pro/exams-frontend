@@ -1,4 +1,4 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { ClassApi } from '../../services/class.service';
@@ -26,79 +26,52 @@ export class CreateClassComponent {
   readonly description = signal('');
 
   // ----------------------------------------------------
-  // STUDENTS
+  // USERS (resource)
+  readonly students = computed<IdentityUser[]>(() =>
+    (this.usersResource.value()?.data ?? []).filter((u) => u.roles?.includes('STUDENT')),
+  );
+  readonly professors = computed<IdentityUser[]>(() =>
+    (this.usersResource.value()?.data ?? []).filter((u) => u.roles?.includes('PROF')),
+  );
   // ----------------------------------------------------
-  readonly allStudents = signal<IdentityUser[]>([]);
-  readonly filteredStudents = signal<IdentityUser[]>([]);
-  readonly selectedStudents = signal<IdentityUser[]>([]);
-
-  // ----------------------------------------------------
-  // PROFESSORS
-  // ----------------------------------------------------
-  readonly allProfessors = signal<IdentityUser[]>([]);
-  readonly filteredProfessors = signal<IdentityUser[]>([]);
-  readonly selectedProfessors = signal<IdentityUser[]>([]);
-
-  // ----------------------------------------------------
-  // UI STATE
-  // ----------------------------------------------------
-  readonly loading = signal(false);
-  readonly submitting = signal(false);
-  readonly error = signal<string | null>(null);
-
-  // ----------------------------------------------------
-  // DEPENDENCIES
-  // ----------------------------------------------------
-  private readonly navigation = inject(NavigationService);
-  private readonly classApi = inject(ClassApi);
-  private readonly userApi = inject(UserApi);
-
-  // ----------------------------------------------------
-  // INIT (Angular 17+)
-  // ----------------------------------------------------
-  constructor() {
-    effect(() => {
-      this.loading.set(true);
-
-      this.userApi.getIdentityUsers().subscribe({
-        next: (res) => {
-          if (!res.success || !res.data) {
-            this.error.set('Failed to load users');
-            return;
-          }
-
-          // Déduplication par identityId
-          const uniqueUsers = Array.from(new Map(res.data.map((u) => [u.identityId, u])).values());
-
-          this.allStudents.set(uniqueUsers.filter((u) => u.roles?.includes('STUDENT')));
-
-          this.allProfessors.set(uniqueUsers.filter((u) => u.roles?.includes('PROF')));
-        },
-        error: () => this.error.set('Server error while loading users'),
-        complete: () => this.loading.set(false),
-      });
-    });
-  }
+  readonly studentQuery = signal('');
+  readonly professorQuery = signal('');
 
   // ----------------------------------------------------
   // SEARCH
   // ----------------------------------------------------
-  searchStudents(query: string): void {
-    this.filteredStudents.set(this.filterUsers(query, this.allStudents(), this.selectedStudents()));
-  }
-
-  searchProfessors(query: string): void {
-    this.filteredProfessors.set(
-      this.filterUsers(query, this.allProfessors(), this.selectedProfessors()),
-    );
-  }
+  readonly selectedStudents = signal<IdentityUser[]>([]);
+  readonly filteredStudents = computed(() =>
+    this.filterUsers(this.studentQuery(), this.students(), this.selectedStudents()),
+  );
+  readonly selectedProfessors = signal<IdentityUser[]>([]);
+  readonly filteredProfessors = computed(() =>
+    this.filterUsers(this.professorQuery(), this.professors(), this.selectedProfessors()),
+  );
 
   // ----------------------------------------------------
-  // SELECT / REMOVE
+  // SELECTION
+  // ----------------------------------------------------
+  readonly submitting = signal(false);
+  // ----------------------------------------------------
+  private readonly userApi = inject(UserApi);
+
+  // ----------------------------------------------------
+  // UI
+  readonly usersResource = this.userApi.identityUsers;
+
+  // ----------------------------------------------------
+  // DEPENDENCIES
+  // ----------------------------------------------------
+  private readonly classApi = inject(ClassApi);
+  private readonly navigation = inject(NavigationService);
+
+  // ----------------------------------------------------
+  // ACTIONS
   // ----------------------------------------------------
   addStudent(user: IdentityUser): void {
     this.selectedStudents.update((v) => [...v, user]);
-    this.filteredStudents.set([]);
+    this.studentQuery.set('');
   }
 
   removeStudent(user: IdentityUser): void {
@@ -107,23 +80,17 @@ export class CreateClassComponent {
 
   addProfessor(user: IdentityUser): void {
     this.selectedProfessors.update((v) => [...v, user]);
-    this.filteredProfessors.set([]);
+    this.professorQuery.set('');
   }
 
   removeProfessor(user: IdentityUser): void {
     this.selectedProfessors.update((v) => v.filter((u) => u.identityId !== user.identityId));
   }
 
-  // ----------------------------------------------------
-  // SUBMIT
-  // ----------------------------------------------------
   submit(): void {
-    if (!this.level() || !this.year()) {
-      return;
-    }
+    if (!this.level() || !this.year()) return;
 
     this.submitting.set(true);
-    this.error.set(null);
 
     const payload: CreateClassRequest = {
       name: this.level(),
@@ -132,16 +99,9 @@ export class CreateClassComponent {
       professorIds: this.selectedProfessors().map((u) => u.identityId),
     };
 
-    this.classApi.create(payload).subscribe({
-      next: (res) => {
-        if (res.success) {
-          this.navigation.goTo(AppRoute.CLASS_DETAIL);
-        } else {
-          this.error.set('Invalid class request');
-        }
-      },
-      error: () => this.error.set('Server error'),
-      complete: () => this.submitting.set(false),
+    this.classApi.create(payload).subscribe(() => {
+      this.navigation.goTo(AppRoute.CLASS_DETAIL);
+      this.submitting.set(false);
     });
   }
 
@@ -149,6 +109,9 @@ export class CreateClassComponent {
     this.navigation.goTo(AppRoute.EXAMS);
   }
 
+  // ----------------------------------------------------
+  // UTILS
+  // ----------------------------------------------------
   private filterUsers(
     query: string,
     source: IdentityUser[],

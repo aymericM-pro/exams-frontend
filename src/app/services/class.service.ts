@@ -10,34 +10,27 @@ import { ApiResponse } from './models/api-response';
 export class ClassApi {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = '/api/classes';
-
-  // --------------------------------------------------
-  // PARAMETERS (signals)
-  // --------------------------------------------------
   readonly allClasses = httpResource<ApiResponse<ClassResponse[]>>(() => ({
     url: this.baseUrl,
   }));
-
-  // --------------------------------------------------
-  // RESOURCES (READ)
-  // --------------------------------------------------
   readonly myClasses = httpResource<ApiResponse<ClassResponse[]>>(() => ({
     url: `${this.baseUrl}/me`,
   }));
   private readonly classId = signal<string | null>(null);
+
   readonly classById = httpResource<ApiResponse<ClassResponse>>(() => {
     const id = this.classId();
     return id ? { url: `${this.baseUrl}/${id}` } : undefined;
   });
-
   readonly studentsByClass = httpResource<ApiResponse<StudentResponse[]>>(() => {
     const id = this.classId();
-    return id ? { url: `${this.baseUrl}/${id}/students` } : undefined;
+    console.log('je suis là');
+    return { url: `${this.baseUrl}/a2b39e6c-f116-45c0-8af9-604f342d80a2/students` };
   });
 
-  // --------------------------------------------------
-  // COMMANDS (WRITE / ACTIONS)
-  // --------------------------------------------------
+  setClassId(id: string): void {
+    this.classId.set(id);
+  }
 
   create(request: CreateClassRequest) {
     return this.http.post<ApiResponse<ClassResponse>>(this.baseUrl, request);

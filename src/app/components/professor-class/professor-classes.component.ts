@@ -17,7 +17,7 @@ export class ProfessorClassesComponent {
 
   openClass(classId: string): void {
     this.navigation.goTo(AppRoute.CLASS_DETAIL, {
-      queryParams: { id: classId },
+      queryParams: { id: 'a2b39e6c-f116-45c0-8af9-604f342d80a2' },
     });
   }
 
