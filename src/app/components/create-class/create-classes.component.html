@@ -1,106 +1,88 @@
 <div class="create-class-page">
 
-  <!-- HEADER -->
   <header class="page-header">
-    <div class="header-content">
-      <h1 class="page-title">Create a class</h1>
-      <p class="page-subtitle">
-        Create a new class to manage students and exams
-      </p>
-    </div>
+    <h1>Create a class</h1>
+    <p>Create a new class with students and professors</p>
   </header>
 
-  <!-- FORM -->
   <section class="form-card">
     <form (ngSubmit)="submit()" class="class-form">
 
-      <!-- CLASS LEVEL -->
+      <!-- LEVEL -->
       <div class="form-group">
         <label>Class level</label>
-        <select
-          (change)="level.set($any($event.target).value)"
-          [value]="level()"
-        >
-          <option value="L1">L1 – Licence 1</option>
-          <option value="L2">L2 – Licence 2</option>
-          <option value="L3">L3 – Licence 3</option>
-          <option value="M1">M1 – Master 1</option>
-          <option value="M2">M2 – Master 2</option>
+        <select (change)="level.set($any($event.target).value)">
+          <option value="L1">L1</option>
+          <option value="L2">L2</option>
+          <option value="L3">L3</option>
+          <option value="M1">M1</option>
+          <option value="M2">M2</option>
         </select>
       </div>
 
-      <!-- YEAR -->
       <div class="form-group">
         <label>Academic year</label>
-        <input
-          (input)="year.set($any($event.target).value)"
-          [value]="year()"
-          placeholder="e.g. 2025"
-          type="text"
-        />
+        <input (input)="year.set($any($event.target).value)" type="text" />
       </div>
 
-      <!-- DESCRIPTION -->
       <div class="form-group">
-        <label>Description (optional)</label>
-        <textarea
-          (input)="description.set($any($event.target).value)"
-          [value]="description()"
-          placeholder="Optional description"
-          rows="3"
-        ></textarea>
+        <label>Description</label>
+        <textarea (input)="description.set($any($event.target).value)"
+                  rows="3">
+        </textarea>
       </div>
 
-      <!-- USERS -->
       <div class="form-group">
         <label>Add students</label>
+        <input (input)="searchStudents($any($event.target).value)" type="text" />
 
-        <input
-          (input)="onSearch($any($event.target).value)"
-          placeholder="Search by name or email"
-          type="text"
-        />
-
-        @if (filteredUsers().length > 0) {
-          <ul class="user-search-results">
-            @for (user of filteredUsers(); track user.id) {
-              <li (click)="addUser(user)">
-                <span class="name">
-                  {{ user.firstName }} {{ user.lastName }}
-                </span>
-                <span class="email">
-                  {{ user.email }}
-                </span>
+        @if (filteredStudents().length > 0) {
+          <ul>
+            @for (u of filteredStudents(); track u.identityId) {
+              <li (click)="addStudent(u)">
+                {{ u.firstname }} {{ u.lastname }} – {{ u.email }}
               </li>
             }
           </ul>
         }
 
-        @if (selectedUsers().length > 0) {
-          <div class="selected-users">
-            @for (user of selectedUsers(); track user.id) {
-              <span class="user-chip">
-                {{ user.firstName }} {{ user.lastName }}
-                <button type="button" (click)="removeUser(user)">×</button>
-              </span>
-            }
-          </div>
-        }
+        <div class="selected-users">
+          @for (u of selectedStudents(); track u.identityId) {
+            <span class="user-chip">
+              {{ u.firstname }} {{ u.lastname }}
+              <button type="button" (click)="removeStudent(u)">×</button>
+            </span>
+          }
+        </div>
       </div>
 
-      <!-- ACTIONS -->
-      <div class="form-actions">
-        <button (click)="cancel()" class="btn-secondary" type="button">
-          Cancel
-        </button>
+      <div class="form-group">
+        <label>Add professors</label>
+        <input (input)="searchProfessors($any($event.target).value)" type="text" />
 
-        <button [disabled]="submitting()" class="btn-primary" type="submit">
-          @if (submitting()) {
-            Creating...
-          } @else {
-            Create class
+        @if (filteredProfessors().length > 0) {
+          <ul>
+            @for (u of filteredProfessors(); track u.identityId) {
+              <li (click)="addProfessor(u)">
+                {{ u.firstname }} {{ u.lastname }} – {{ u.email }}
+              </li>
+            }
+          </ul>
+        }
+
+        <div class="selected-users">
+          @for (u of selectedProfessors(); track u.identityId) {
+            <span class="user-chip">
+              {{ u.firstname }} {{ u.lastname }}
+              <button type="button" (click)="removeProfessor(u)">×</button>
+            </span>
           }
-        </button>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button (click)="cancel()" type="button">Cancel</button>
+        <button [disabled]="submitting()" type="submit">Create class</button>
       </div>
 
     </form>
