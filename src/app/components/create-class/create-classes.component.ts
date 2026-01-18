@@ -1,11 +1,12 @@
 import { Component, effect, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import { ClassApi } from '../../services/class.service';
 import { UserApi } from '../../services/user.service';
 import { CreateClassRequest } from '../../services/models/create-class.model';
 import { IdentityUser } from '../../services/models/identity-user.model';
+import { NavigationService } from '../../services/navigation.service';
+import { AppRoute } from '../../AppRoute';
 
 type ClassLevel = 'L1' | 'L2' | 'L3' | 'M1' | 'M2';
 
@@ -17,26 +18,44 @@ type ClassLevel = 'L1' | 'L2' | 'L3' | 'M1' | 'M2';
   imports: [FormsModule],
 })
 export class CreateClassComponent {
+  // ----------------------------------------------------
+  // FORM STATE
+  // ----------------------------------------------------
   readonly level = signal<ClassLevel>('M1');
   readonly year = signal('');
   readonly description = signal('');
 
+  // ----------------------------------------------------
+  // STUDENTS
+  // ----------------------------------------------------
   readonly allStudents = signal<IdentityUser[]>([]);
   readonly filteredStudents = signal<IdentityUser[]>([]);
   readonly selectedStudents = signal<IdentityUser[]>([]);
 
+  // ----------------------------------------------------
+  // PROFESSORS
+  // ----------------------------------------------------
   readonly allProfessors = signal<IdentityUser[]>([]);
   readonly filteredProfessors = signal<IdentityUser[]>([]);
   readonly selectedProfessors = signal<IdentityUser[]>([]);
 
+  // ----------------------------------------------------
+  // UI STATE
+  // ----------------------------------------------------
   readonly loading = signal(false);
   readonly submitting = signal(false);
   readonly error = signal<string | null>(null);
 
-  private readonly router = inject(Router);
+  // ----------------------------------------------------
+  // DEPENDENCIES
+  // ----------------------------------------------------
+  private readonly navigation = inject(NavigationService);
   private readonly classApi = inject(ClassApi);
   private readonly userApi = inject(UserApi);
 
+  // ----------------------------------------------------
+  // INIT (Angular 17+)
+  // ----------------------------------------------------
   constructor() {
     effect(() => {
       this.loading.set(true);
@@ -48,10 +67,12 @@ export class CreateClassComponent {
             return;
           }
 
-          const unique = Array.from(new Map(res.data.map((u) => [u.identityId, u])).values());
+          // Déduplication par identityId
+          const uniqueUsers = Array.from(new Map(res.data.map((u) => [u.identityId, u])).values());
 
-          this.allStudents.set(unique.filter((u) => u.roles?.includes('STUDENT')));
-          this.allProfessors.set(unique.filter((u) => u.roles?.includes('PROF')));
+          this.allStudents.set(uniqueUsers.filter((u) => u.roles?.includes('STUDENT')));
+
+          this.allProfessors.set(uniqueUsers.filter((u) => u.roles?.includes('PROF')));
         },
         error: () => this.error.set('Server error while loading users'),
         complete: () => this.loading.set(false),
@@ -59,6 +80,9 @@ export class CreateClassComponent {
     });
   }
 
+  // ----------------------------------------------------
+  // SEARCH
+  // ----------------------------------------------------
   searchStudents(query: string): void {
     this.filteredStudents.set(this.filterUsers(query, this.allStudents(), this.selectedStudents()));
   }
@@ -69,26 +93,34 @@ export class CreateClassComponent {
     );
   }
 
-  addStudent(u: IdentityUser) {
-    this.selectedStudents.update((v) => [...v, u]);
+  // ----------------------------------------------------
+  // SELECT / REMOVE
+  // ----------------------------------------------------
+  addStudent(user: IdentityUser): void {
+    this.selectedStudents.update((v) => [...v, user]);
     this.filteredStudents.set([]);
   }
 
-  removeStudent(u: IdentityUser) {
-    this.selectedStudents.update((v) => v.filter((x) => x.identityId !== u.identityId));
+  removeStudent(user: IdentityUser): void {
+    this.selectedStudents.update((v) => v.filter((u) => u.identityId !== user.identityId));
   }
 
-  addProfessor(u: IdentityUser) {
-    this.selectedProfessors.update((v) => [...v, u]);
+  addProfessor(user: IdentityUser): void {
+    this.selectedProfessors.update((v) => [...v, user]);
     this.filteredProfessors.set([]);
   }
 
-  removeProfessor(u: IdentityUser) {
-    this.selectedProfessors.update((v) => v.filter((x) => x.identityId !== u.identityId));
+  removeProfessor(user: IdentityUser): void {
+    this.selectedProfessors.update((v) => v.filter((u) => u.identityId !== user.identityId));
   }
 
+  // ----------------------------------------------------
+  // SUBMIT
+  // ----------------------------------------------------
   submit(): void {
-    if (!this.level() || !this.year()) return;
+    if (!this.level() || !this.year()) {
+      return;
+    }
 
     this.submitting.set(true);
     this.error.set(null);
@@ -103,9 +135,9 @@ export class CreateClassComponent {
     this.classApi.create(payload).subscribe({
       next: (res) => {
         if (res.success) {
-          this.router.navigate(['/classes']);
+          this.navigation.goTo(AppRoute.CLASS_DETAIL);
         } else {
-          this.error.set('Invalid request');
+          this.error.set('Invalid class request');
         }
       },
       error: () => this.error.set('Server error'),
@@ -114,7 +146,7 @@ export class CreateClassComponent {
   }
 
   cancel(): void {
-    this.router.navigate(['/classes']);
+    this.navigation.goTo(AppRoute.EXAMS);
   }
 
   private filterUsers(

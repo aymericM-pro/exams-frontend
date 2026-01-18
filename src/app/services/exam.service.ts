@@ -1,5 +1,5 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, httpResource } from '@angular/common/http';
 import { ApiResponse } from './models/api-response';
 
 export interface AnswerDto {
@@ -28,38 +28,20 @@ export interface ExamDto {
 
 @Injectable({ providedIn: 'root' })
 export class ExamService {
-  readonly exams = signal<ExamDto[]>([]);
-  readonly exam = signal<ExamDto | null>(null);
-
-  readonly loading = signal(false);
-  readonly error = signal<string | null>(null);
-
+  readonly examId = signal<string | null>(null);
   private readonly http = inject(HttpClient);
   private readonly baseUrl = '/api/exams';
 
-  loadExams(): void {
-    this.loading.set(true);
-    this.error.set(null);
+  readonly exams = httpResource<ApiResponse<ExamDto[]>>(() => ({
+    url: this.baseUrl,
+  }));
 
-    this.http.get<ApiResponse<ExamDto[]>>(this.baseUrl).subscribe({
-      next: (res) => this.exams.set(res.data),
-      error: () => this.error.set('Failed to load exams'),
-      complete: () => this.loading.set(false),
-    });
-  }
+  readonly exam = httpResource<ApiResponse<ExamDto>>(() => {
+    const id = this.examId();
+    return id ? { url: `${this.baseUrl}/${id}` } : undefined;
+  });
 
-  loadExamById(id: string): void {
-    this.loading.set(true);
-    this.error.set(null);
-
-    this.http.get<ApiResponse<ExamDto>>(`${this.baseUrl}/${id}`).subscribe({
-      next: (res) => this.exam.set(res.data),
-      error: () => this.error.set('Failed to load exam'),
-      complete: () => this.loading.set(false),
-    });
-  }
-
-  deleteExam(id: string): void {
-    this.exams.update((exams) => exams.filter((e) => e.examId !== id));
+  deleteExam(id: string) {
+    return this.http.delete<ApiResponse<void>>(`${this.baseUrl}/${id}`);
   }
 }

@@ -1,11 +1,11 @@
-import { Component, effect, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
-import { ExamService } from '../../services/exam.service';
+import { ExamDto, ExamService } from '../../services/exam.service';
+import { ExamSessionService } from '../../services/exam-session.service';
 import { NavigationService } from '../../services/navigation.service';
 import { AppRoute } from '../../AppRoute';
-import { ExamSessionService } from '../../services/exam-session.service';
 
 @Component({
   selector: 'app-professor-exams',
@@ -15,29 +15,13 @@ import { ExamSessionService } from '../../services/exam-session.service';
   styleUrl: './professor-exams.component.scss',
 })
 export class ProfessorExamsComponent {
+  readonly exams = computed<ExamDto[]>(() => this.examsResource.value()?.data ?? []);
+  readonly loading = computed(() => this.examsResource.isLoading());
+  readonly error = computed(() => this.examsResource.error());
   private readonly examService = inject(ExamService);
-  readonly exams = this.examService.exams;
-  readonly loading = this.examService.loading;
-  readonly error = this.examService.error;
+  readonly examsResource = this.examService.exams;
   private readonly examSessionService = inject(ExamSessionService);
   private readonly navigation = inject(NavigationService);
-
-  constructor() {
-    this.examService.loadExams();
-
-    effect(() => {
-      console.log('👨‍🏫 Exams:', this.exams());
-    });
-
-    effect(() => {
-      const session = this.examSessionService.session();
-      if (session) {
-        console.log('session created : ', session.createdAt);
-        // navigation post-création (optionnelle mais propre)
-        // this.navigation.goTo(`${AppRoute.EXAM_SESSIONS}/${session.sessionId}` as AppRoute);
-      }
-    });
-  }
 
   startSession(examId: string): void {
     if (!confirm('Start a new session for this exam?')) {
@@ -64,8 +48,10 @@ export class ProfessorExamsComponent {
   }
 
   deleteExam(id: string): void {
-    if (confirm('Delete this exam?')) {
-      this.examService.deleteExam(id);
-    }
+    if (!confirm('Delete this exam?')) return;
+
+    this.examService.deleteExam(id).subscribe(() => {
+      this.examsResource.reload();
+    });
   }
 }

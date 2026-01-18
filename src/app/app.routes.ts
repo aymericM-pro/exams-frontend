@@ -6,6 +6,7 @@ import { UpcomingExamsComponent } from './components/upcoming-exams/upcoming-exa
 import { ProfessorExamsComponent } from './components/professor-exam/professor-exam.component';
 import { DetailClassComponent } from './components/create-detail/detail-classes.component';
 import { CreateClassComponent } from './components/create-class/create-classes.component';
+import { ProfessorClassesComponent } from './components/professor-class/professor-classes.component';
 
 export const routes: Routes = [
   {
@@ -28,6 +29,7 @@ export const routes: Routes = [
     children: [
       { path: 'create', component: CreateClassComponent },
       { path: 'detail', component: DetailClassComponent },
+      { path: 'all-classes', component: ProfessorClassesComponent },
     ],
   },
   {

@@ -15,82 +15,91 @@
       </a>
     </div>
   </header>
+
   <!-- FILTERS -->
-  <div *ngIf="exams().length > 0" class="semester-filters">
-    <button
-      (click)="selectSemester(s)"
-      *ngFor="let s of semesters"
-      [class.active]="selectedSemester() === s"
-      class="semester-btn"
-    >
-      {{ s }}
-    </button>
-  </div>
-
-  <section *ngIf="filteredExams().length > 0" class="exam-list">
-    <div
-      *ngFor="let exam of filteredExams()"
-      class="exam-card"
-    >
-      <div class="exam-header">
-        <div class="exam-info">
-          <i class="mdi mdi-file-document-outline icon"></i>
-          <div>
-            <h3>{{ exam.title }}</h3>
-            <p>{{ exam.description }}</p>
-          </div>
-        </div>
-
-        <button (click)="deleteExam(exam.examId)" class="delete">
-          html
-          Copy code
-          <i class="mdi mdi-delete-outline"></i>
+  @if (exams().length > 0) {
+    <div class="semester-filters">
+      @for (s of semesters; track s) {
+        <button
+          (click)="selectSemester(s)"
+          [class.active]="selectedSemester() === s"
+          class="semester-btn"
+        >
+          {{ s }}
         </button>
-      </div>
-
-      <div class="exam-meta">
-        <div class="meta-item">
-          <i class="mdi mdi-book-multiple-outline"></i>
-          {{ exam.questions.length }} questions
-        </div>
-
-        <div class="meta-item">
-          <i class="mdi mdi-calendar-outline"></i>
-          {{ exam.semester }}
-        </div>
-        
-        <div class="meta-item">
-          <i class="mdi mdi-clock-outline"></i>
-          {{ exam.createdAt | date }}
-        </div>
-      </div>
-
-      <!-- ACTION -->
-      <div class="exam-actions">
-        <button (click)="openExam(exam.examId)" class="btn view">
-          <i class="mdi mdi-eye-outline"></i>
-          View Exam
-        </button>
-      </div>
+      }
     </div>
-  </section>
+  }
 
-  <div *ngIf="exams().length === 0" class="empty-state">
-    <i class="mdi mdi-file-plus-outline"></i>
-    <p>No exam yet. Create your first exam.</p>
+  <!-- EXAMS LIST -->
+  @if (filteredExams().length > 0) {
+    <section class="exam-list">
+      @for (exam of filteredExams(); track exam.examId) {
+        <div class="exam-card">
 
-    <a class="btn add" routerLink="/exams/builder">
-      <i class="mdi mdi-plus"></i>
-      Create Exam
-    </a>
-  </div>
+          <div class="exam-header">
+            <div class="exam-info">
+              <i class="mdi mdi-file-document-outline icon"></i>
+              <div>
+                <h3>{{ exam.title }}</h3>
+                <p>{{ exam.description }}</p>
+              </div>
+            </div>
 
-  <div
-    *ngIf="exams().length > 0 && filteredExams().length === 0"
-    class="empty-state"
-  >
-    <i class="mdi mdi-file-remove-outline"></i>
-    <p>No exams found for this semester.</p>
-  </div>
+            <button (click)="deleteExam(exam.examId)" class="delete">
+              <i class="mdi mdi-delete-outline"></i>
+            </button>
+          </div>
+
+          <div class="exam-meta">
+            <div class="meta-item">
+              <i class="mdi mdi-book-multiple-outline"></i>
+              {{ exam.questions.length }} questions
+            </div>
+
+            <div class="meta-item">
+              <i class="mdi mdi-calendar-outline"></i>
+              {{ exam.semester }}
+            </div>
+
+            <div class="meta-item">
+              <i class="mdi mdi-clock-outline"></i>
+              {{ exam.createdAt | date }}
+            </div>
+          </div>
+
+          <!-- ACTION -->
+          <div class="exam-actions">
+            <button (click)="openExam(exam.examId)" class="btn view">
+              <i class="mdi mdi-eye-outline"></i>
+              View Exam
+            </button>
+          </div>
+
+        </div>
+      }
+    </section>
+  }
+
+  <!-- EMPTY : NO EXAMS -->
+  @if (exams().length === 0) {
+    <div class="empty-state">
+      <i class="mdi mdi-file-plus-outline"></i>
+      <p>No exam yet. Create your first exam.</p>
+
+      <a class="btn add" routerLink="/exams/builder">
+        <i class="mdi mdi-plus"></i>
+        Create Exam
+      </a>
+    </div>
+  }
+
+  <!-- EMPTY : NO EXAMS FOR SEMESTER -->
+  @if (exams().length > 0 && filteredExams().length === 0) {
+    <div class="empty-state">
+      <i class="mdi mdi-file-remove-outline"></i>
+      <p>No exams found for this semester.</p>
+    </div>
+  }
 
 </div>

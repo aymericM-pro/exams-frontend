@@ -47,5 +47,12 @@ export class SidebarComponent {
       path: '/classes/detail',
       exact: true,
     },
+    {
+      id: 'all-classes',
+      icon: 'mdi-school-outline',
+      label: 'All Classes',
+      path: '/classes/all-classes',
+      exact: true,
+    },
   ];
 }

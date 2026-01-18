@@ -1,7 +1,8 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ExamService } from '../../services/exam.service';
+import { ActivatedRoute } from '@angular/router';
+
+import { ExamService, QuestionDto } from '../../services/exam.service';
 import { AppRoute } from '../../AppRoute';
 import { NavigationService } from '../../services/navigation.service';
 
@@ -13,16 +14,17 @@ import { NavigationService } from '../../services/navigation.service';
   styleUrl: './exam-detail.component.scss',
 })
 export class ExamDetailComponent {
-  // ===== state =====
+  // --------------------------------------------------
+  // STATE
+  // --------------------------------------------------
   readonly answers = signal<Record<string, string | string[]>>({});
   readonly submitted = signal(false);
   readonly score = signal(0);
-  protected readonly String = String;
-  private readonly route = inject(ActivatedRoute);
-  readonly examId = this.route.snapshot.paramMap.get('id');
-  private readonly router = inject(Router);
-  private readonly examService = inject(ExamService);
-  readonly exam = this.examService.exam;
+  // --------------------------------------------------
+  readonly exam = computed(() => this.examResource.value()?.data ?? null);
+
+  // --------------------------------------------------
+  // INJECTIONS
   readonly createdAt = computed(() => {
     const exam = this.exam();
     return exam ? new Date(exam.createdAt).toLocaleDateString() : '';
@@ -31,14 +33,32 @@ export class ExamDetailComponent {
   readonly totalMCQ = computed(
     () => this.exam()?.questions.filter((q) => q.answers?.length).length ?? 0,
   );
+
+  // --------------------------------------------------
+  // RESOURCE
   readonly totalOpen = computed(
     () => this.exam()?.questions.filter((q) => !q.answers?.length).length ?? 0,
   );
+
+  // --------------------------------------------------
+  // DERIVED DATA (computed)
+  protected readonly String = String;
+  // --------------------------------------------------
+  private readonly route = inject(ActivatedRoute);
+  private readonly examService = inject(ExamService);
+  // --------------------------------------------------
+  readonly examResource = this.examService.exam;
   private readonly navigation = inject(NavigationService);
 
+  // --------------------------------------------------
+  // INIT
+
+  // --------------------------------------------------
   constructor() {
-    if (this.examId) {
-      this.examService.loadExamById(this.examId);
+    const examId = this.route.snapshot.paramMap.get('id');
+    if (examId) {
+      // minimalisme assumé : pilotage direct du signal
+      this.examService.examId.set(examId);
     }
 
     effect(() => {
@@ -46,11 +66,16 @@ export class ExamDetailComponent {
     });
   }
 
+  // --------------------------------------------------
+  // NAVIGATION
+  // --------------------------------------------------
   goBack(): void {
     this.navigation.goTo(AppRoute.EXAMS);
   }
 
-  // ===== answers handlers =====
+  // --------------------------------------------------
+  // ANSWERS HANDLERS
+  // --------------------------------------------------
   setSingleAnswer(questionId: string | number, answerId: string | number): void {
     this.answers.update((v) => ({
       ...v,
@@ -59,7 +84,7 @@ export class ExamDetailComponent {
   }
 
   toggleMultipleAnswer(questionId: string | number, answerId: string | number): void {
-    const current = (this.answers()[questionId] as string[]) ?? [];
+    const current = (this.answers()[String(questionId)] as string[]) ?? [];
 
     this.answers.update((v) => ({
       ...v,
@@ -69,23 +94,28 @@ export class ExamDetailComponent {
     }));
   }
 
-  isMultipleSelected(questionIndex: number, answerIndex: number): boolean {
-    const value = this.answers()[questionIndex.toString()];
-    return Array.isArray(value) && value.includes(answerIndex.toString());
+  isMultipleSelected(questionId: string | number, answerId: string | number): boolean {
+    const value = this.answers()[String(questionId)];
+    return Array.isArray(value) && value.includes(String(answerId));
   }
 
   setTextAnswer(questionId: string | number, value: string): void {
-    this.answers.update((v) => ({ ...v, [questionId]: value }));
+    this.answers.update((v) => ({
+      ...v,
+      [questionId]: value,
+    }));
   }
 
-  // ===== submit =====
+  // --------------------------------------------------
+  // SUBMIT
+  // --------------------------------------------------
   submitExam(): void {
     const exam = this.exam();
     if (!exam) return;
 
     let correct = 0;
 
-    exam.questions.forEach((q) => {
+    exam.questions.forEach((q: QuestionDto) => {
       if (!q.questionId || !q.answers?.length) return;
 
       const correctIds = q.answers
@@ -94,7 +124,11 @@ export class ExamDetailComponent {
         .sort();
 
       const userValue = this.answers()[q.questionId];
-      const userIds = Array.isArray(userValue) ? [...userValue].sort() : [userValue];
+      const userIds = Array.isArray(userValue)
+        ? [...userValue].sort()
+        : userValue
+          ? [userValue]
+          : [];
 
       if (JSON.stringify(correctIds) === JSON.stringify(userIds)) {
         correct++;

@@ -1,0 +1,58 @@
+<div class="professor-classes-page">
+
+  <header class="page-header">
+    <div class="header-content">
+      <h1>My classes</h1>
+      <p>Classes you are responsible for as a professor</p>
+    </div>
+
+    <button
+      (click)="createClass()"
+      class="btn-primary"
+      type="button"
+    >
+      + Create a class
+    </button>
+  </header>
+
+  @if (classApi.myClasses.isLoading()) {
+    <div class="state loading">
+      Loading classes…
+    </div>
+  }
+
+  @if (classApi.myClasses.error()) {
+    <div class="state error">
+      Unable to load classes
+    </div>
+  }
+
+  @if (!classApi.myClasses.isLoading() &&
+  classApi.myClasses.value()?.data?.length === 0) {
+    <div class="state empty">
+      <p>No classes assigned yet.</p>
+    </div>
+  }
+
+  @if (classApi.myClasses.value()?.data; as classes) {
+    <div class="class-list">
+      @for (cls of classes; track cls.classId) {
+        <div
+          class="class-card"
+          (click)="openClass(cls.classId)"
+        >
+          <div class="class-main">
+            <h3>{{ cls.name }}</h3>
+            <span class="year">{{ cls.graduationYear }}</span>
+          </div>
+
+          <div class="class-meta">
+            <span>{{ cls.studentIds.length }} students</span>
+            <span>{{ cls.professorIds.length }} professors</span>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</div>

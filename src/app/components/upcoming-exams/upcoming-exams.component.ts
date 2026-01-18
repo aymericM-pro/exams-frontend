@@ -1,45 +1,30 @@
-import { Component, effect, inject } from '@angular/core';
-import { Router } from '@angular/router';
-import { ExamService } from '../../services/exam.service';
+import { Component, computed, inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
-export interface UpcomingExam {
-  sessionId: string;
-  examId: string;
-  title: string;
-  semester: string;
-  startAt: string;
-  durationMinutes: number;
-}
+import { ExamDto, ExamService } from '../../services/exam.service';
+import { NavigationService } from '../../services/navigation.service';
+import { AppRoute } from '../../AppRoute';
 
 @Component({
   selector: 'app-upcoming-exams',
-  templateUrl: './upcoming-exams.component.html',
-  styleUrls: ['./upcoming-exams.component.scss'],
   standalone: true,
   imports: [DatePipe],
+  templateUrl: './upcoming-exams.component.html',
+  styleUrls: ['./upcoming-exams.component.scss'],
 })
 export class UpcomingExamsComponent {
+  readonly exams = computed<ExamDto[]>(() => this.examsResource.value()?.data ?? []);
+  readonly loading = computed(() => this.examsResource.isLoading());
+  readonly error = computed(() => this.examsResource.error());
   private readonly examService = inject(ExamService);
-  readonly exams = this.examService.exams;
-  readonly loading = this.examService.loading;
-  readonly error = this.examService.error;
-  private readonly router = inject(Router);
-
-  constructor() {
-    this.examService.loadExams();
-
-    console.log('je suis la ');
-    effect(() => {
-      console.log('📚 Exams:', this.exams());
-    });
-  }
+  readonly examsResource = this.examService.exams;
+  private readonly navigation = inject(NavigationService);
 
   openExam(examId: string): void {
-    // void this.router.navigate(['/exams', examId]);
+    this.navigation.goTo(`${AppRoute.EXAMS}/${examId}` as AppRoute);
   }
 
   startExam(examId: string): void {
-    console.log('Start exam', examId);
+    console.log('Start exam', examId); // futur : création de session + navigation
   }
 }

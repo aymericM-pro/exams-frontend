@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 describe('NavigationService', () => {
   it('navigates to route', () => {
     const router = { navigate: vi.fn() };
-    const service = new NavigationService(router as any);
+    const service = new NavigationService();
 
     service.goTo(AppRoute.EXAMS);
 
