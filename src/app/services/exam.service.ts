@@ -1,12 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-
-export interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  meta: any;
-  timestamp: string;
-}
+import { ApiResponse } from './models/api-response';
 
 export interface AnswerDto {
   answerId: string | null;

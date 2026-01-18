@@ -1,0 +1,226 @@
+/* PAGE */
+.students-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  padding: 2.5rem 2rem 4rem;
+  min-height: 100vh;
+  background: #f8fafc;
+  color: #1e293b;
+}
+
+/* HEADER */
+.page-header {
+  background: #ffffff;
+  border-radius: 1rem;
+  padding: 2rem 2.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.page-subtitle {
+  margin-top: 0.3rem;
+  color: #64748b;
+}
+
+/* HEADER ACTIONS */
+.header-actions {
+  display: flex;
+  align-items: center;
+}
+
+/* PRIMARY BUTTON */
+.btn-primary {
+  background: #6366f1;
+  color: #ffffff;
+  border: none;
+
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.6rem;
+
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition: background 0.15s ease,
+  transform 0.1s ease,
+  box-shadow 0.1s ease;
+
+  &:hover {
+    background: #4f46e5;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(79, 70, 229, 0.2);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px #ffffff,
+    0 0 0 4px rgba(99, 102, 241, 0.5);
+  }
+}
+
+/* GRID */
+.students-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+/* CARD */
+.student-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1.25rem;
+  padding: 1.75rem;
+  min-height: 380px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.student-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.12);
+}
+
+/* ACTION BAR */
+.student-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* REMOVE BUTTON */
+.remove-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  min-height: 32px;
+  padding: 0 0.75rem;
+
+  background-color: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 0.5rem;
+
+  color: #b91c1c;
+  font-size: 0.75rem;
+  font-weight: 700;
+
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.remove-btn:hover {
+  background-color: #dc2626;
+  border-color: #b91c1c;
+  color: #ffffff;
+}
+
+.remove-btn i {
+  font-size: 0.9rem;
+}
+
+/* AVATAR */
+.student-avatar {
+  width: 4.2rem;
+  height: 4.2rem;
+  margin: 0 auto;
+
+  border-radius: 50%;
+  background: #eef2ff;
+  color: #6366f1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+}
+
+/* INFO */
+.student-info {
+  text-align: center;
+}
+
+.student-info h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.student-info .email {
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+/* DETAILS */
+.student-details {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px dashed #e5e7eb;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+
+  font-size: 0.8rem;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+}
+
+.detail-item .label {
+  color: #64748b;
+}
+
+.detail-item .value {
+  font-weight: 600;
+}
+
+/* BADGES */
+.badge {
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.badge.active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.badge.inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* EMPTY */
+.empty-state {
+  text-align: center;
+  color: #94a3b8;
+}

@@ -1,0 +1,109 @@
+<div class="create-class-page">
+
+  <!-- HEADER -->
+  <header class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Create a class</h1>
+      <p class="page-subtitle">
+        Create a new class to manage students and exams
+      </p>
+    </div>
+  </header>
+
+  <!-- FORM -->
+  <section class="form-card">
+    <form (ngSubmit)="submit()" class="class-form">
+
+      <!-- CLASS LEVEL -->
+      <div class="form-group">
+        <label>Class level</label>
+        <select
+          (change)="level.set($any($event.target).value)"
+          [value]="level()"
+        >
+          <option value="L1">L1 – Licence 1</option>
+          <option value="L2">L2 – Licence 2</option>
+          <option value="L3">L3 – Licence 3</option>
+          <option value="M1">M1 – Master 1</option>
+          <option value="M2">M2 – Master 2</option>
+        </select>
+      </div>
+
+      <!-- YEAR -->
+      <div class="form-group">
+        <label>Academic year</label>
+        <input
+          (input)="year.set($any($event.target).value)"
+          [value]="year()"
+          placeholder="e.g. 2025"
+          type="text"
+        />
+      </div>
+
+      <!-- DESCRIPTION -->
+      <div class="form-group">
+        <label>Description (optional)</label>
+        <textarea
+          (input)="description.set($any($event.target).value)"
+          [value]="description()"
+          placeholder="Optional description"
+          rows="3"
+        ></textarea>
+      </div>
+
+      <!-- USERS -->
+      <div class="form-group">
+        <label>Add students</label>
+
+        <input
+          (input)="onSearch($any($event.target).value)"
+          placeholder="Search by name or email"
+          type="text"
+        />
+
+        @if (filteredUsers().length > 0) {
+          <ul class="user-search-results">
+            @for (user of filteredUsers(); track user.id) {
+              <li (click)="addUser(user)">
+                <span class="name">
+                  {{ user.firstName }} {{ user.lastName }}
+                </span>
+                <span class="email">
+                  {{ user.email }}
+                </span>
+              </li>
+            }
+          </ul>
+        }
+
+        @if (selectedUsers().length > 0) {
+          <div class="selected-users">
+            @for (user of selectedUsers(); track user.id) {
+              <span class="user-chip">
+                {{ user.firstName }} {{ user.lastName }}
+                <button type="button" (click)="removeUser(user)">×</button>
+              </span>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="form-actions">
+        <button (click)="cancel()" class="btn-secondary" type="button">
+          Cancel
+        </button>
+
+        <button [disabled]="submitting()" class="btn-primary" type="submit">
+          @if (submitting()) {
+            Creating...
+          } @else {
+            Create class
+          }
+        </button>
+      </div>
+
+    </form>
+  </section>
+
+</div>

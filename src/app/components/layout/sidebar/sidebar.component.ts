@@ -40,5 +40,12 @@ export class SidebarComponent {
       path: '/exams/professor',
       exact: true,
     },
+    {
+      id: 'detail',
+      icon: 'mdi-account-group-outline',
+      label: 'Classes',
+      path: '/classes/detail',
+      exact: true,
+    },
   ];
 }

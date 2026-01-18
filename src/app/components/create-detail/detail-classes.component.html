@@ -1,0 +1,131 @@
+<div class="students-page">
+
+  <!-- HEADER -->
+  <header class="page-header">
+    <div class="header-content">
+
+      <div class="header-info">
+        <h1 class="page-title">
+          @if (classDetail()) {
+            {{ classDetail()!.name }}
+          } @else {
+            Class Students
+          }
+        </h1>
+
+        <p class="page-subtitle">
+          @if (classDetail()) {
+            {{ classDetail()!.year }} – enrolled students
+          } @else {
+            View and manage students enrolled in this class
+          }
+        </p>
+      </div>
+
+      <!-- ACTION -->
+      <div class="header-actions">
+        <button
+          (click)="goToCreateClass()"
+          class="btn-primary"
+          type="button"
+        >
+          + Créer une classe
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  @if (loading()) {
+
+    <!-- LOADING -->
+    <div class="empty-state">
+      Loading students...
+    </div>
+
+  } @else if (usersInClass().length > 0) {
+
+    <!-- STUDENTS GRID -->
+    <section class="students-grid">
+      @for (student of usersInClass(); track student.id) {
+
+        <div class="student-card">
+
+          <!-- ACTIONS -->
+          <div class="student-actions">
+            <button
+              class="remove-btn"
+              type="button"
+              (click)="removeUser(student.id)"
+              title="Supprimer l'étudiant"
+            >
+              <i class="mdi mdi-delete-outline"></i>
+              Supprimer
+            </button>
+          </div>
+
+          <!-- AVATAR -->
+          <div class="student-avatar">
+            <i class="mdi mdi-account"></i>
+          </div>
+
+          <!-- IDENTITY -->
+          <div class="student-info">
+            <h3>{{ student.firstName }} {{ student.lastName }}</h3>
+            <p class="email">{{ student.email }}</p>
+          </div>
+
+          <!-- ACADEMIC INFO -->
+          <div class="student-details">
+
+            <div class="detail-item">
+              <span class="label">Student number</span>
+              <span class="value">{{ student.studentNumber }}</span>
+            </div>
+
+            <div class="detail-item">
+              <span class="label">Status</span>
+              <span
+                class="badge"
+                [class.active]="student.status === 'Active'"
+                [class.inactive]="student.status === 'Inactive'"
+              >
+                {{ student.status }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <span class="label">Gender</span>
+              <span class="value">{{ student.gender }}</span>
+            </div>
+
+            <div class="detail-item">
+              <span class="label">Age</span>
+              <span class="value">{{ student.age }} years</span>
+            </div>
+
+            <div class="detail-item">
+              <span class="label">Birth date</span>
+              <span class="value">
+                {{ student.birthDate | date:'longDate' }}
+              </span>
+            </div>
+
+          </div>
+
+        </div>
+
+      }
+    </section>
+
+  } @else {
+
+    <!-- EMPTY -->
+    <div class="empty-state">
+      <i class="mdi mdi-account-multiple-outline"></i>
+      <p>No students in this class yet.</p>
+    </div>
+
+  }
+
+</div>

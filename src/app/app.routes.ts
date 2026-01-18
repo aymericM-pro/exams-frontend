@@ -4,6 +4,8 @@ import { ExamDetailComponent } from './components/exam-detail/exam-detail.compon
 import { ExamBuilderComponent } from './components/exam-builder/exam-builder.component';
 import { UpcomingExamsComponent } from './components/upcoming-exams/upcoming-exams.component';
 import { ProfessorExamsComponent } from './components/professor-exam/professor-exam.component';
+import { DetailClassComponent } from './components/create-detail/detail-classes.component';
+import { CreateClassComponent } from './components/create-class/create-classes.component';
 
 export const routes: Routes = [
   {
@@ -19,6 +21,13 @@ export const routes: Routes = [
       { path: 'upcoming', component: UpcomingExamsComponent },
       { path: 'professor', component: ProfessorExamsComponent },
       { path: ':id', component: ExamDetailComponent },
+    ],
+  },
+  {
+    path: 'classes',
+    children: [
+      { path: 'create', component: CreateClassComponent },
+      { path: 'detail', component: DetailClassComponent },
     ],
   },
   {
