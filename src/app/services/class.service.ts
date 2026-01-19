@@ -10,34 +10,75 @@ import { ApiResponse } from './models/api-response';
 export class ClassApi {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = '/api/classes';
+
   readonly allClasses = httpResource<ApiResponse<ClassResponse[]>>(() => ({
     url: this.baseUrl,
   }));
   readonly myClasses = httpResource<ApiResponse<ClassResponse[]>>(() => ({
     url: `${this.baseUrl}/me`,
   }));
-  private readonly classId = signal<string | null>(null);
 
+  private readonly classId = signal<string | null>(null);
   readonly classById = httpResource<ApiResponse<ClassResponse>>(() => {
     const id = this.classId();
     return id ? { url: `${this.baseUrl}/${id}` } : undefined;
   });
+
+  // READ RESOURCES
   readonly studentsByClass = httpResource<ApiResponse<StudentResponse[]>>(() => {
     const id = this.classId();
-    console.log('je suis là');
-    return { url: `${this.baseUrl}/a2b39e6c-f116-45c0-8af9-604f342d80a2/students` };
+    return id ? { url: `${this.baseUrl}/${id}/students` } : undefined;
+  });
+  private readonly studentToRemove = signal<string | null>(null);
+  readonly removeStudentResource = httpResource<void>(() => {
+    const classId = this.classId();
+    const studentId = this.studentToRemove();
+
+    if (!classId || !studentId) return undefined;
+
+    return {
+      url: `${this.baseUrl}/${classId}/students/${studentId}`,
+      method: 'DELETE',
+    };
+  });
+  private readonly classPayload = signal<CreateClassRequest | null>(null);
+
+  private readonly classToUpdate = signal<string | null>(null);
+  readonly saveClassResource = httpResource<ApiResponse<ClassResponse>>(() => {
+    const payload = this.classPayload();
+    if (!payload) return undefined;
+
+    const id = this.classToUpdate();
+
+    return id
+      ? {
+          url: `${this.baseUrl}/${id}`,
+          method: 'PUT',
+          body: payload,
+        }
+      : {
+          url: this.baseUrl,
+          method: 'POST',
+          body: payload,
+        };
   });
 
   setClassId(id: string): void {
     this.classId.set(id);
   }
 
-  create(request: CreateClassRequest) {
-    return this.http.post<ApiResponse<ClassResponse>>(this.baseUrl, request);
+  removeStudentFromClass(studentId: string): void {
+    this.studentToRemove.set(studentId);
   }
 
-  delete(id: string) {
-    return this.http.delete<ApiResponse<void>>(`${this.baseUrl}/${id}`);
+  create(payload: CreateClassRequest): void {
+    this.classPayload.set(payload);
+    this.classToUpdate.set(null);
+  }
+
+  update(id: string, payload: CreateClassRequest): void {
+    this.classPayload.set(payload);
+    this.classToUpdate.set(id);
   }
 
   exportStudentsPdf(classId: string) {

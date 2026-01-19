@@ -1,108 +1,138 @@
 <div class="create-class-page">
 
+  <!-- HEADER -->
   <header class="page-header">
-    <h1>Create a class</h1>
-    <p>Create a new class with students and professors</p>
+    <h1>{{ isEditMode() ? 'Edit class' : 'Create a class' }}</h1>
+    <p>
+      {{
+        isEditMode()
+          ? 'Update class information, students and professors'
+          : 'Create a new class with students and professors'
+      }}
+    </p>
   </header>
 
-  <section class="form-card">
-    <form (ngSubmit)="submit()" class="class-form">
+  <!-- LOADING (edit mode only) -->
+  @if (isEditMode() && !classValue()) {
+    <div class="empty-state">
+      Loading class information...
+    </div>
+  } @else {
 
-      <!-- LEVEL -->
-      <div class="form-group">
-        <label>Class level</label>
-        <select (change)="level.set($any($event.target).value)" [value]="level()">
-          <option value="L1">L1</option>
-          <option value="L2">L2</option>
-          <option value="L3">L3</option>
-          <option value="M1">M1</option>
-          <option value="M2">M2</option>
-        </select>
-      </div>
+    <section class="form-card">
+      <form (ngSubmit)="submit()" class="class-form">
 
-      <div class="form-group">
-        <label>Academic year</label>
-        <input
-          (input)="year.set($any($event.target).value)"
-          [value]="year()"
-          type="text"
-        />
-      </div>
-
-      <div class="form-group">
-        <label>Description</label>
-        <textarea
-          (input)="description.set($any($event.target).value)"
-          [value]="description()"
-          rows="3">
-        </textarea>
-      </div>
-
-      <!-- STUDENTS -->
-      <div class="form-group">
-        <label>Add students</label>
-        <input
-          (input)="studentQuery.set($any($event.target).value)"
-          [value]="studentQuery()"
-          type="text"
-        />
-
-        @if (filteredStudents().length > 0) {
-          <ul>
-            @for (u of filteredStudents(); track u.identityId) {
-              <li (click)="addStudent(u)">
-                {{ u.firstname }} {{ u.lastname }} – {{ u.email }}
-              </li>
-            }
-          </ul>
-        }
-
-        <div class="selected-users">
-          @for (u of selectedStudents(); track u.identityId) {
-            <span class="user-chip">
-              {{ u.firstname }} {{ u.lastname }}
-              <button type="button" (click)="removeStudent(u)">×</button>
-            </span>
-          }
+        <!-- LEVEL -->
+        <div class="form-group">
+          <label>Class level</label>
+          <select
+            (change)="level.set($any($event.target).value)"
+            [value]="level()"
+          >
+            <option value="L1">L1</option>
+            <option value="L2">L2</option>
+            <option value="L3">L3</option>
+            <option value="M1">M1</option>
+            <option value="M2">M2</option>
+          </select>
         </div>
-      </div>
 
-      <!-- PROFESSORS -->
-      <div class="form-group">
-        <label>Add professors</label>
-        <input
-          (input)="professorQuery.set($any($event.target).value)"
-          [value]="professorQuery()"
-          type="text"
-        />
-
-        @if (filteredProfessors().length > 0) {
-          <ul>
-            @for (u of filteredProfessors(); track u.identityId) {
-              <li (click)="addProfessor(u)">
-                {{ u.firstname }} {{ u.lastname }} – {{ u.email }}
-              </li>
-            }
-          </ul>
-        }
-
-        <div class="selected-users">
-          @for (u of selectedProfessors(); track u.identityId) {
-            <span class="user-chip">
-              {{ u.firstname }} {{ u.lastname }}
-              <button type="button" (click)="removeProfessor(u)">×</button>
-            </span>
-          }
+        <!-- YEAR -->
+        <div class="form-group">
+          <label>Academic year</label>
+          <input
+            type="text"
+            placeholder="2025 – 2026"
+            (input)="year.set($any($event.target).value)"
+            [value]="year()"
+          />
         </div>
-      </div>
 
-      <!-- ACTIONS -->
-      <div class="form-actions">
-        <button (click)="cancel()" type="button">Cancel</button>
-        <button [disabled]="submitting()" type="submit">Create class</button>
-      </div>
+        <!-- DESCRIPTION (optional / future-proof) -->
+        <div class="form-group">
+          <label>Description</label>
+          <textarea
+            rows="3"
+            placeholder="Optional description"
+            (input)="description.set($any($event.target).value)"
+            [value]="description()"
+          ></textarea>
+        </div>
 
-    </form>
-  </section>
+        <!-- STUDENTS -->
+        <div class="form-group">
+          <label>Add students</label>
+          <input
+            type="text"
+            placeholder="Search student by name or email"
+            (input)="studentQuery.set($any($event.target).value)"
+            [value]="studentQuery()"
+          />
+
+          @if (filteredStudents().length > 0) {
+            <ul class="suggestions">
+              @for (u of filteredStudents(); track u.identityId) {
+                <li (click)="addStudent(u)">
+                  {{ u.firstname }} {{ u.lastname }} – {{ u.email }}
+                </li>
+              }
+            </ul>
+          }
+
+          <div class="selected-users">
+            @for (u of selectedStudents(); track u.identityId) {
+              <span class="user-chip">
+                {{ u.firstname }} {{ u.lastname }}
+                <button type="button" (click)="removeStudent(u)">×</button>
+              </span>
+            }
+          </div>
+        </div>
+
+        <!-- PROFESSORS -->
+        <div class="form-group">
+          <label>Add professors</label>
+          <input
+            type="text"
+            placeholder="Search professor by name or email"
+            (input)="professorQuery.set($any($event.target).value)"
+            [value]="professorQuery()"
+          />
+
+          @if (filteredProfessors().length > 0) {
+            <ul class="suggestions">
+              @for (u of filteredProfessors(); track u.identityId) {
+                <li (click)="addProfessor(u)">
+                  {{ u.firstname }} {{ u.lastname }} – {{ u.email }}
+                </li>
+              }
+            </ul>
+          }
+
+          <div class="selected-users">
+            @for (u of selectedProfessors(); track u.identityId) {
+              <span class="user-chip">
+                {{ u.firstname }} {{ u.lastname }}
+                <button type="button" (click)="removeProfessor(u)">×</button>
+              </span>
+            }
+          </div>
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="form-actions">
+          <button type="button" (click)="cancel()">Cancel</button>
+
+          <button
+            type="submit"
+          >
+            {{ isEditMode() ? 'Save changes' : 'Create class' }}
+          </button>
+        </div>
+
+      </form>
+    </section>
+
+  }
 
 </div>

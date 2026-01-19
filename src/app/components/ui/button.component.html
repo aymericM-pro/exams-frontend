@@ -1,0 +1,11 @@
+<button
+  [attr.type]="type"
+  [class]="classes.join(' ')"
+  [disabled]="disabled || loading"
+>
+  @if (loading) {
+    <span class="spinner"></span>
+  } @else {
+    <ng-content></ng-content>
+  }
+</button>

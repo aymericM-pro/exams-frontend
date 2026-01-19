@@ -6,23 +6,30 @@
 
       <div class="header-info">
         <h1 class="page-title">
-          Class Students
+          {{ i18n.t().class.studentsTitle }}
         </h1>
 
         <p class="page-subtitle">
-          View and manage students enrolled in this class
+          {{ i18n.t().class.studentsSubtitle }}
         </p>
       </div>
 
-      <!-- ACTION -->
+      <!-- ACTIONS -->
       <div class="header-actions">
-        <button
-          (click)="goToCreateClass()"
-          class="btn-primary"
+        <app-button
+          (click)="editClass()"
           type="button"
+          variant="secondary"
         >
-          + Créer une classe
-        </button>
+          {{ i18n.t().common.edit }}
+        </app-button>
+
+        <app-button
+          type="button"
+          variant="primary"
+        >
+          {{ i18n.t().class.create }}
+        </app-button>
       </div>
 
     </div>
@@ -30,9 +37,8 @@
 
   @if (loading()) {
 
-    <!-- LOADING -->
     <div class="empty-state">
-      Loading students...
+      {{ i18n.t().common.loading }}
     </div>
 
   } @else if (usersInClass().length > 0) {
@@ -45,15 +51,15 @@
 
           <!-- ACTIONS -->
           <div class="student-actions">
-            <button
-              class="remove-btn"
+            <app-button
+              variant="danger"
+              size="sm"
               type="button"
-              (click)="removeUser(student.id)"
-              title="Supprimer l'étudiant"
+              (click)="removeStudent(student.id)"
             >
               <i class="mdi mdi-delete-outline"></i>
-              Supprimer
-            </button>
+              {{ i18n.t().common.delete }}
+            </app-button>
           </div>
 
           <!-- AVATAR -->
@@ -67,16 +73,20 @@
             <p class="email">{{ student.email }}</p>
           </div>
 
-          <!-- ACADEMIC INFO -->
+          <!-- DETAILS -->
           <div class="student-details">
 
             <div class="detail-item">
-              <span class="label">Student number</span>
+              <span class="label">
+                {{ i18n.t().student.number }}
+              </span>
               <span class="value">{{ student.studentNumber }}</span>
             </div>
 
             <div class="detail-item">
-              <span class="label">Status</span>
+              <span class="label">
+                {{ i18n.t().student.status }}
+              </span>
               <span
                 class="badge"
                 [class.active]="student.status === 'Active'"
@@ -87,20 +97,10 @@
             </div>
 
             <div class="detail-item">
-              <span class="label">Gender</span>
-              <span class="value">{{ student.gender }}</span>
-            </div>
-
-            <div class="detail-item">
-              <span class="label">Age</span>
-              <!--              <span class="value">{{ student.age }} years</span>-->
-            </div>
-
-            <div class="detail-item">
-              <span class="label">Birth date</span>
-              <span class="value">
-<!--                {{ student.birthDate | date:'longDate' }}-->
+              <span class="label">
+                {{ i18n.t().student.gender }}
               </span>
+              <span class="value">{{ student.gender }}</span>
             </div>
 
           </div>
@@ -112,10 +112,9 @@
 
   } @else {
 
-    <!-- EMPTY -->
     <div class="empty-state">
       <i class="mdi mdi-account-multiple-outline"></i>
-      <p>No students in this class yet.</p>
+      <p>{{ i18n.t().class.noStudents }}</p>
     </div>
 
   }

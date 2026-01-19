@@ -1,49 +1,54 @@
 import { Component, computed, effect, inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-
 import { ClassApi } from '../../services/class.service';
 import { NavigationService } from '../../services/navigation.service';
 import { AppRoute } from '../../AppRoute';
-import { StudentResponse } from '../../services/models/student-responses.model';
+import { ButtonComponent } from '../ui/app-button.component';
+import { I18nService } from '../../services/i18n/I18nService.service';
 
 @Component({
   selector: 'app-class-users',
   standalone: true,
   templateUrl: './detail-classes.component.html',
   styleUrls: ['./detail-classes.component.scss'],
+  imports: [ButtonComponent],
 })
 export class DetailClassComponent {
-  private readonly route = inject(ActivatedRoute);
+  readonly i18n = inject(I18nService);
+  readonly usersInClass = computed(() => this.studentsResource.value()?.data ?? []);
+  readonly loading = computed(() => this.studentsResource.isLoading());
   private readonly classApi = inject(ClassApi);
   readonly studentsResource = this.classApi.studentsByClass;
-  readonly usersInClass = computed<StudentResponse[]>(
-    () => this.studentsResource.value()?.data ?? [],
-  );
-  readonly loading = computed(() => this.studentsResource.isLoading());
   private readonly navigation = inject(NavigationService);
+  private readonly classId = 'a2b39e6c-f116-45c0-8af9-604f342d80a2';
 
   constructor() {
-    const classId = this.route.snapshot.paramMap.get('id');
-    if (classId) {
-      this.classApi.setClassId(classId);
-    }
+    this.classApi.setClassId(this.classId);
 
     effect(() => {
-      console.log('[studentsResource]');
-      console.log('loading:', this.studentsResource.isLoading());
-      console.log('value:', this.studentsResource.value());
-      console.log('error:', this.studentsResource.error());
+      const error = this.classApi.removeStudentResource.error();
+      const done = this.classApi.removeStudentResource.value();
+
+      if (error) {
+        console.error(this.i18n.t().common.deleteError, error);
+        return;
+      }
+
+      if (done !== undefined) {
+        this.studentsResource.reload();
+      }
     });
   }
 
-  goToCreateClass(): void {
-    this.navigation.goTo(AppRoute.CLASS_CREATE);
+  removeStudent(studentId: string): void {
+    this.classApi.removeStudentFromClass(studentId);
   }
 
-  removeUser(studentId: string): void {
-    console.log('remove student', studentId);
-
-    // après DELETE backend
-    this.studentsResource.reload();
+  editClass(): void {
+    this.navigation.goTo(AppRoute.CLASS_CREATE, {
+      queryParams: {
+        mode: 'edit',
+        classId: this.classId,
+      },
+    });
   }
 }
